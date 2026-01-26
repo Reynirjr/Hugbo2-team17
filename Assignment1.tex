@@ -6,7 +6,7 @@
 \geometry{a4paper, margin=1in}
 
 \title{Assignment 1 - Project Plan and Requirements}
-\author{Team [Number]}
+\author{Team 17 - brj46, hfd2, jjo1, ros30}
 \date{\today}
 
 \begin{document}
@@ -15,63 +15,94 @@
 
 \section{Project Vision}
 
-% Provide your project vision document, data sheet, or press release here.
-% If revising from HBV501G, adjust accordingly.
+\subsection{Vision Statement}
+The vision of this project is to deliver a simple, fast, and reliable Android application that allows customers to browse restaurant menus, place orders, and track order status directly from their mobile device. The app focuses on reducing friction in the ordering process and providing a smooth end-to-end experience from menu discovery to pickup.
 
-\subsection{1.5 Title Here} Skip subsections if using Data Sheet or Press Release. Note whether you are doing a new vision document, or revising a previous one.
+\subsection{Product Scope}
+This Android application represents the customer-facing client of the OOPS (Online Order Printing Software) system. The app integrates with an existing backend and focuses exclusively on customer functionality, including browsing menus, managing a basket, placing orders, paying by card, and viewing order status. Administrative and staff features are intentionally excluded.
 
-\subsection{1.x Additional Section Title}
-
-\subsection{2.x Additional Section Title (except 2.1)}
+\subsection{Value for Users}
+\textbf{Customers} benefit from a modern mobile ordering experience with clear pricing, real-time availability, secure card payments, and transparent order status updates. The app eliminates the need for phone calls and reduces uncertainty around pickup times.
 
 \section{Product Backlog}
+We use a \textbf{grouped priority system} where a lower number means higher priority (P1 > P2 > P3).
+Estimates are given in \textbf{person hours}.
 
-Below is the prioritized backlog with user stories:
-Note what kind of priority system is used. In order? grouped? Is a lower number higher priority? (Recommended to group and use lower number = higher priority; E.g. P1 is higher priority than P2).
 \begin{itemize}
-    \item \textbf{User Story 1 [US1; P1]}: Information about user story here
-    \item \textbf{User Story 2 [US2; P2]}: Information about user story here
-    % Add more user stories as needed
+    \item \textbf{US1 [P1]}: As a customer, I want to view the restaurant menu with prices and availability so that I can decide what to order.
+    
+    \item \textbf{US2 [P1]}: As a customer, I want to view the status of my order so that I know whether it is pending, preparing, or ready for pickup.
+    
+    \item \textbf{US3 [P1]}: As a customer, I want to place an order so that the restaurant receives my request.
+    
+    \item \textbf{US4 [P1]}: As a customer, I want to confirm my order before final submission so that I can verify items, prices, and pickup details.
+    
+    \item \textbf{US5 [P1]}: As a customer, I want to add items to a basket and view its contents so that I can manage my order before checkout.
+    
+    \item \textbf{US6 [P2]}: As a customer, I want to log in using my phone number so that my orders can be associated with me.
+    
+    \item \textbf{US7 [P3]}: As a customer, I want to filter the menu to show only vegetarian items so that I can easily find suitable options.
+    
+    \item \textbf{US8 [P1]}: As a customer, I want to see the estimated wait time before ordering so that I can decide whether to place an order.
 \end{itemize}
+
 
 \section{User Story Estimates}
 
-Below is the estimation table for user stories using the PERT formula:
-Note down what size you're using for estimates. Is it person days, or work hours?
+Estimates are calculated using the \textbf{PERT formula} and measured in \textbf{person hours}.
+
 \begin{longtable}{|c|c|c|c|c|}
     \hline
     \textbf{User Story} & \textbf{Best Case} & \textbf{Most Likely} & \textbf{Worst Case} & \textbf{PERT Estimate} \\
     \hline
-    US1 & X & Y & Z & $\frac{X + 4Y + Z}{6}$ \\
+    US1 (View menu) & 4 & 6 & 8 & $\frac{4 + 4(6) + 8}{6} = 6$ \\
     \hline
-    US2 & A & B & C & $\frac{A + 4B + C}{6}$ \\
+    US2 (View order status) & 4 & 6 & 9 & $\frac{4 + 4(6) + 9}{6} = 6.2$ \\
     \hline
-    % Add more user stories as needed
+    US3 (Place order) & 6 & 9 & 13 & $\frac{6 + 4(9) + 13}{6} = 9.2$ \\
+    \hline
+    US4 (Confirm order) & 3 & 5 & 7 & $\frac{3 + 4(5) + 7}{6} = 5$ \\
+    \hline
+    US5 (Basket management) & 5 & 7 & 10 & $\frac{5 + 4(7) + 10}{6} = 7.2$ \\
+    \hline
+    US6 (Login with phone number) & 3 & 5 & 7 & $\frac{3 + 4(5) + 7}{6} = 5$ \\
+    \hline
+    US7 (Vegetarian filter) & 2 & 4 & 6 & $\frac{2 + 4(4) + 6}{6} = 4$ \\
+    \hline
+    US8 (Estimated wait time) & 3 & 5 & 8 & $\frac{3 + 4(5) + 8}{6} = 5.2$ \\
+    \hline
 \end{longtable}
 
 \section{Project Schedule}
 
-Below is the schedule for the 10-week project timeline (starting the week after assignment 1 turn-in):
-Note that there are 4 sprints, one for each assignment. Sprint 1 is two weeks, Sprint 2 and Sprint 3 are three weeks, and the final sprint is two weeks. Decide who is going to be the P.O. for each of the sprints.
-\textbf{This is a template for a schedule, adjust as needed.}
+The project runs for \textbf{10 weeks} and follows the course structure with
+\textbf{five project presentations (A1--A5)}.
+Development is iterative, with each delivery building on the previous one.
 
 \begin{longtable}{|c|c|c|c|c|c|}
     \hline
-    \textbf{Week} & \textbf{User Stories} & \textbf{Expected Hours} & \textbf{P.O. (Initials)} & \textbf{Sprint} & \textbf{Consultation}\\
+    \textbf{Week} & \textbf{User Stories / Activities} & \textbf{Expected Hours} & \textbf{P.O.} & \textbf{Sprint} & \textbf{Consultation / Delivery}\\
     \hline
-    1 & None & XX & AB & 1 & \textbf{A1 Presentation}\\
+    1 & Project planning, requirements analysis & 6 & N/A & 1 & No consultation\\
     \hline
-    2 & US1, Android skeleton & XX & AB & 1 & Model Drafts\\
+    2 & Vision document, use cases, Android skeleton & 10 & N/A & 1 & \textbf{A1 Presentation}\\
     \hline
-    3 & US2, US3 & XX & CD & 2 & \textbf{A2 Presentation}\\
+    3 & US1 (View menu), US8 (Estimated wait time) & 18 & JJO & 2 & Model drafts\\
     \hline
-    4 & US4, US5, US6 & XX & CD & 2 & Dev support\\
+    4 & US5 (Basket management), US7 (Vegetarian filter) & 20 & JJO & 2 & \textbf{A2 Presentation}\\
     \hline
-    5 & US7, US8 & XX & CD & 2 & Dev support\\
+    5 & US3 (Place order), US4 (Confirm order) & 22 & HFD & 3 & Development support\\
     \hline
-    6 & US9, US10 & XX & EF & 3 & \textbf{A3 Presentation}\\
+    6 & US6 (Login with phone number) & 14 & HFD & 3 & \textbf{A3 Presentation}\\
     \hline
-    % Continue until week 10
+    7 & US2 (View order status), backend integration & 16 & BRJ & 4 & Development support\\
+    \hline
+    8 & Persistence, networking, error handling & 14 & BRJ & 4 & \textbf{A4 Presentation}\\
+    \hline
+    9 & Testing, bug fixes, UI polish & 18 & ROS & 5 & Development support\\
+    \hline
+    10 & Final integration, documentation, delivery & 15 & ROS & 5 & \textbf{A5 Final Presentation}\\
+    \hline
 \end{longtable}
 
 \end{document}
