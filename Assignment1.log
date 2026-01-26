@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2022/dev/Debian) (preloaded format=pdflatex 2026.1.26)  26 JAN 2026 15:59
+This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2022/dev/Debian) (preloaded format=pdflatex 2026.1.26)  26 JAN 2026 16:04
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -98,28 +98,38 @@ Package: iftex 2020/03/06 v1.0d TeX engine tests
 \Gm@layoutvoffset=\dimen162
 \Gm@dimlist=\toks19
 )
+(/usr/share/texlive/texmf-dist/tex/latex/tools/tabularx.sty
+Package: tabularx 2020/01/15 v2.11c `tabularx' package (DPC)
+\TX@col@width=\dimen163
+\TX@old@table=\dimen164
+\TX@old@col=\dimen165
+\TX@target=\dimen166
+\TX@delta=\dimen167
+\TX@cols=\count271
+\TX@ftn=\toks20
+)
 (/usr/share/texlive/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def
 File: l3backend-pdftex.def 2022-01-12 L3 backend support: PDF output (pdfTeX)
-\l__color_backend_stack_int=\count271
+\l__color_backend_stack_int=\count272
 \l__pdf_internal_box=\box57
 )
 (./Assignment1.aux)
 \openout1 = `Assignment1.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 12.
-LaTeX Font Info:    ... okay on input line 12.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 12.
-LaTeX Font Info:    ... okay on input line 12.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 12.
-LaTeX Font Info:    ... okay on input line 12.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 12.
-LaTeX Font Info:    ... okay on input line 12.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 12.
-LaTeX Font Info:    ... okay on input line 12.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 12.
-LaTeX Font Info:    ... okay on input line 12.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 12.
-LaTeX Font Info:    ... okay on input line 12.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 14.
+LaTeX Font Info:    ... okay on input line 14.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 14.
+LaTeX Font Info:    ... okay on input line 14.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 14.
+LaTeX Font Info:    ... okay on input line 14.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 14.
+LaTeX Font Info:    ... okay on input line 14.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 14.
+LaTeX Font Info:    ... okay on input line 14.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 14.
+LaTeX Font Info:    ... okay on input line 14.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 14.
+LaTeX Font Info:    ... okay on input line 14.
 
 *geometry* driver: auto-detecting
 *geometry* detected driver: pdftex
@@ -156,31 +166,41 @@ LaTeX Font Info:    ... okay on input line 12.
 * (1in=72.27pt=25.4mm, 1cm=28.453pt)
 
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <12> on input line 14.
+(Font)              <12> on input line 16.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <8> on input line 14.
+(Font)              <8> on input line 16.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <6> on input line 14.
+(Font)              <6> on input line 16.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <7> on input line 58.
+(Font)              <7> on input line 60.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <5> on input line 58.
+(Font)              <5> on input line 60.
 [1
 
 
 
 pdfTeX warning: pdflatex (file pdftex.map): cannot open font map file
 ]
-Overfull \hbox (126.9867pt too wide) in alignment at lines 82--106
+Overfull \hbox (25.4936pt too wide) in alignment at lines 84--88
+ [] [] [] [] [] [] 
+ []
+
+
+Overfull \hbox (25.4936pt too wide) in alignment at lines 88--93
+ [] [] [] [] [] [] 
+ []
+
+
+Overfull \hbox (25.4936pt too wide) in alignment at lines 93--115
  [] [] [] [] [] [] 
  []
 
 [2] (./Assignment1.aux) ) 
 Here is how much of TeX's memory you used:
- 1276 strings out of 480247
- 21228 string characters out of 5896151
- 335693 words of memory out of 5000000
- 19266 multiletter control sequences out of 15000+600000
+ 1341 strings out of 480247
+ 22314 string characters out of 5896151
+ 339739 words of memory out of 5000000
+ 19327 multiletter control sequences out of 15000+600000
  473849 words of font info for 43 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
  55i,6n,62p,412b,187s stack positions out of 5000i,500n,10000p,200000b,80000s
@@ -193,7 +213,7 @@ r10.pk> </home/helgi/.texlive2021/texmf-var/fonts/pk/ljfour/public/cm/cmbx12.60
 0pk> </home/helgi/.texlive2021/texmf-var/fonts/pk/ljfour/public/cm/cmbx12.720pk
 > </usr/share/texlive/texmf-dist/fonts/pk/ljfour/public/cm/dpi600/cmr12.pk> </u
 sr/share/texlive/texmf-dist/fonts/pk/ljfour/public/cm/dpi600/cmr17.pk>
-Output written on Assignment1.pdf (2 pages, 75051 bytes).
+Output written on Assignment1.pdf (2 pages, 75058 bytes).
 PDF statistics:
  281 PDF objects out of 1000 (max. 8388607)
  42 compressed objects within 1 object stream

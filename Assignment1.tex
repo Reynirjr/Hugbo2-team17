@@ -3,6 +3,8 @@
 \usepackage{longtable}
 \usepackage{array}
 \usepackage{geometry}
+\usepackage{tabularx}
+
 \geometry{a4paper, margin=1in}
 
 \title{Assignment 1 - Project Plan and Requirements}
@@ -79,10 +81,17 @@ The project runs for \textbf{10 weeks} and follows the course structure with
 \textbf{five project presentations (A1--A5)}.
 Development is iterative, with each delivery building on the previous one.
 
-\begin{longtable}{|c|c|c|c|c|c|}
+\begin{longtable}{|c|>{\raggedright\arraybackslash}p{5.2cm}|c|c|c|>{\raggedright\arraybackslash}p{3.3cm}|}
     \hline
     \textbf{Week} & \textbf{User Stories / Activities} & \textbf{Expected Hours} & \textbf{P.O.} & \textbf{Sprint} & \textbf{Consultation / Delivery}\\
     \hline
+    \endfirsthead
+
+    \hline
+    \textbf{Week} & \textbf{User Stories / Activities} & \textbf{Expected Hours} & \textbf{P.O.} & \textbf{Sprint} & \textbf{Consultation / Delivery}\\
+    \hline
+    \endhead
+
     1 & Project planning, requirements analysis & 6 & N/A & 1 & No consultation\\
     \hline
     2 & Vision document, use cases, Android skeleton & 10 & N/A & 1 & \textbf{A1 Presentation}\\
