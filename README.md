@@ -4,7 +4,7 @@
 
 **Team members**: Benjamín, Helgi, Jonathan, Róbert
 
-## Hugbo1-team16 
+## Hugbo2-team17 
 
 OOPS empowers businesses to process online orders instantly and accurately, making every transaction seamless and stress-free.
 
