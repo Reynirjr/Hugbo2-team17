@@ -1,4 +1,8 @@
 package com.example.whoopsmobile.model
 
-class MenuSection {
-}
+data class MenuSection(
+    val id: Int,
+    val name: String,
+    val displayOrder: Int,
+    val items: List<Item>
+)
