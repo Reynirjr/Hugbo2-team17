@@ -7,11 +7,15 @@ import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
 
+object ApiConstants {
+    const val BASE_URL = "https://hugbo2-team17.onrender.com"
+}
+
 class ApiHelper {
 
     fun getItems(): List<Item> {
 
-        val url = URL("http://10.0.2.2:8080/api/menus")
+        val url = URL("${ApiConstants.BASE_URL}/api/menus")
         val connection = url.openConnection() as HttpURLConnection
         connection.requestMethod = "GET"
 
