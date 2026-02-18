@@ -8,7 +8,7 @@ import java.net.HttpURLConnection
 import java.net.URL
 
 object ApiConstants {
-    const val BASE_URL = "postgresql://whoops_db_p3as_user:Wabitm1CnQCbuocEygVwKTRmCLNQqCXx@dpg-d6av0kur433s73febb5g-a/whoops_db_p3as"
+    const val BASE_URL = "https://hugbo2-team17.onrender.com"
 }
 
 class ApiHelper {
