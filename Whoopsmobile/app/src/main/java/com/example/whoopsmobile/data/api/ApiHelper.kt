@@ -17,9 +17,8 @@ class ApiHelper {
 
     fun getItems(): ApiResult {
 
-
         return try {
-            val url = URL(ApiConstants.BASE_URL + "/api/menus")
+            val url = URL("${ApiConstants.BASE_URL}/api/menus")
             val connection = url.openConnection() as HttpURLConnection
             connection.requestMethod = "GET"
 
