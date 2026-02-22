@@ -4,16 +4,19 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.whoopsmobile.R
 import com.example.whoopsmobile.data.api.ApiHelper
+import com.example.whoopsmobile.data.api.ApiResult
 
 class MenuFragment : Fragment() {
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: MenuAdapter
+    private lateinit var emptyText: TextView
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -26,6 +29,8 @@ class MenuFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
         recyclerView = view.findViewById(R.id.rvItems)
+        emptyText = view.findViewById(R.id.tvEmpty)
+
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
         adapter = MenuAdapter(emptyList())
@@ -39,10 +44,30 @@ class MenuFragment : Fragment() {
         Thread {
 
             val apiHelper = ApiHelper()
-            val items = apiHelper.getItems()
+            val result = apiHelper.getItems()
 
             requireActivity().runOnUiThread {
-                adapter.updateItems(items)
+
+                when (result) {
+
+                    is ApiResult.Success -> {
+                        recyclerView.visibility = View.VISIBLE
+                        emptyText.visibility = View.GONE
+                        adapter.updateItems(result.items)
+                    }
+
+                    is ApiResult.Empty -> {
+                        recyclerView.visibility = View.GONE
+                        emptyText.visibility = View.VISIBLE
+                        emptyText.text = "Nothing on menu"
+                    }
+
+                    is ApiResult.Error -> {
+                        recyclerView.visibility = View.GONE
+                        emptyText.visibility = View.VISIBLE
+                        emptyText.text = result.message
+                    }
+                }
             }
 
         }.start()
