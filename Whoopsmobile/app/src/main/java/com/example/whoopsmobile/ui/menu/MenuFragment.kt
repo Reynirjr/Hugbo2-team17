@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.whoopsmobile.R
+import com.example.whoopsmobile.data.HagaMenuData
 import com.example.whoopsmobile.data.api.ApiHelper
 import com.example.whoopsmobile.data.api.ApiResult
 
@@ -57,9 +58,9 @@ class MenuFragment : Fragment() {
                     }
 
                     is ApiResult.Empty -> {
-                        recyclerView.visibility = View.GONE
-                        emptyText.visibility = View.VISIBLE
-                        emptyText.text = "Nothing on menu"
+                        recyclerView.visibility = View.VISIBLE
+                        emptyText.visibility = View.GONE
+                        adapter.updateItems(HagaMenuData.items)
                     }
 
                     is ApiResult.Error -> {
