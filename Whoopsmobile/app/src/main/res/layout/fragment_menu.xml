@@ -1,18 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="#F6F4E4">
 
+    <!-- Header -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#291317"
+        android:orientation="vertical"
+        android:padding="24dp"
+        android:elevation="4dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Menu"
+            android:textSize="32sp"
+            android:textStyle="bold"
+            android:textColor="#F6F4E4"
+            android:layout_gravity="center_horizontal"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Welcome to the Burger Place"
+            android:textSize="16sp"
+            android:textColor="#F6F4E4"
+            android:layout_marginTop="8dp"
+            android:layout_gravity="center_horizontal"/>
+    </LinearLayout>
+
+    <!-- Empty State -->
     <TextView
-        android:text="Menu"
-        android:textSize="24sp"
-        android:padding="16dp"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        android:id="@+id/tvEmpty"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Nothing on menu"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textColor="#555555"
+        android:gravity="center"
+        android:visibility="gone"
+        android:layout_marginTop="40dp"/>
 
+    <!-- Menu List -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvItems"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:padding="12dp"
+        android:background="#F6F4E4"
+        android:clipToPadding="false"/>
+
 </LinearLayout>
