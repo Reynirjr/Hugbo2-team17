@@ -10,7 +10,8 @@ import java.net.HttpURLConnection
 import java.net.URL
 
 object ApiConstants {
-    const val BASE_URL = "https://hugbo2-team17.onrender.com"
+    const val SUPABASE_URL = "https://jomjklhroehwripfoift.supabase.co"
+    const val SUPABASE_ANON_KEY = "REDACTED_SUPABASE_ANON_KEY"
 }
 
 class ApiHelper {
@@ -18,9 +19,13 @@ class ApiHelper {
     fun getItems(): ApiResult {
 
         return try {
-            val url = URL("${ApiConstants.BASE_URL}/api/menus")
+            val query = "select=*,sections(*,items(*))"
+            val url = URL("${ApiConstants.SUPABASE_URL}/rest/v1/menus?$query")
             val connection = url.openConnection() as HttpURLConnection
             connection.requestMethod = "GET"
+            connection.setRequestProperty("apikey", ApiConstants.SUPABASE_ANON_KEY)
+            connection.setRequestProperty("Authorization", "Bearer ${ApiConstants.SUPABASE_ANON_KEY}")
+            connection.setRequestProperty("Accept", "application/json")
 
             if (connection.responseCode != 200) {
                 return ApiResult.Error("Server error: ${connection.responseCode}")
@@ -32,14 +37,6 @@ class ApiHelper {
             Log.d("API_RESPONSE", response)
             val trimmed = response.trim()
 
-            // API returned error JSON
-            if (trimmed.startsWith("{")) {
-                val obj = JSONObject(trimmed)
-                if (obj.has("error")) {
-                    return ApiResult.Error(obj.getString("error"))
-                }
-            }
-
             val items = mutableListOf<Item>()
             val menusArray = JSONArray(response)
 
@@ -48,24 +45,22 @@ class ApiHelper {
             }
 
             val menuObject = menusArray.getJSONObject(0)
-            val sectionsArray = menuObject.getJSONArray("sections")
+            val sectionsArray = menuObject.optJSONArray("sections") ?: return ApiResult.Empty
 
             for (i in 0 until sectionsArray.length()) {
                 val section = sectionsArray.getJSONObject(i)
-                val itemsArray = section.getJSONArray("items")
+                val itemsArray = section.optJSONArray("items") ?: continue
 
                 for (j in 0 until itemsArray.length()) {
-
                     val itemObj = itemsArray.getJSONObject(j)
-
                     items.add(
                         Item(
                             id = itemObj.getInt("id"),
                             name = itemObj.getString("name"),
-                            description = itemObj.getString("description"),
-                            priceIsk = itemObj.getInt("priceIsk"),
-                            available = itemObj.getBoolean("available"),
-                            tags = itemObj.getString("tags"),
+                            description = itemObj.optString("description", ""),
+                            priceIsk = itemObj.optInt("price_isk", itemObj.optInt("priceIsk", 0)),
+                            available = itemObj.optBoolean("available", true),
+                            tags = itemObj.optString("tags", ""),
                             imageData = null
                         )
                     )
@@ -73,9 +68,9 @@ class ApiHelper {
             }
 
             if (items.isEmpty()) {
-                ApiResult.Empty
+                return ApiResult.Empty
             } else {
-                ApiResult.Success(items)
+                return ApiResult.Success(items)
             }
 
         } catch (e: Exception) {
