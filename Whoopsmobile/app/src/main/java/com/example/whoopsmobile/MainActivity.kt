@@ -7,6 +7,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.example.whoopsmobile.service.BasketService
 import com.example.whoopsmobile.service.SessionManager
 import com.example.whoopsmobile.ui.basket.BasketFragment
 import com.example.whoopsmobile.ui.checkout.CheckoutFragment
@@ -21,6 +22,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         SessionManager.init(this)
+        BasketService.init(this)
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
 
