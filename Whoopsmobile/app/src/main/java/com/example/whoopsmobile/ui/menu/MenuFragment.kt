@@ -5,15 +5,19 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageButton
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.whoopsmobile.MainActivity
 import com.example.whoopsmobile.R
 import com.example.whoopsmobile.data.HagaMenuData
 import com.example.whoopsmobile.data.api.ApiHelper
 import com.example.whoopsmobile.data.api.ApiResult
 import com.example.whoopsmobile.model.Item
+import com.example.whoopsmobile.service.BasketService
+import com.example.whoopsmobile.service.SessionManager
 import com.google.android.material.chip.ChipGroup
 
 class MenuFragment : Fragment() {
@@ -22,6 +26,7 @@ class MenuFragment : Fragment() {
     private lateinit var adapter: MenuAdapter
     private lateinit var emptyText: TextView
     private lateinit var filterChipGroup: ChipGroup
+    private lateinit var basketBadge: TextView
 
     private var allItems: List<Item> = emptyList()
 
@@ -38,11 +43,15 @@ class MenuFragment : Fragment() {
         recyclerView = view.findViewById(R.id.rvItems)
         emptyText = view.findViewById(R.id.tvEmpty)
         filterChipGroup = view.findViewById(R.id.filterChipGroup)
+        basketBadge = view.findViewById(R.id.basketBadge)
+        val btnBasket: ImageButton = view.findViewById(R.id.btnBasket)
 
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
-        adapter = MenuAdapter(emptyList())
+        adapter = MenuAdapter(emptyList()) { item -> (activity as? MainActivity)?.openItemDetails(item.id) }
         recyclerView.adapter = adapter
+
+        btnBasket.setOnClickListener { (activity as? MainActivity)?.openBasket() }
 
         filterChipGroup.setOnCheckedStateChangeListener { _, checkedIds ->
             if (checkedIds.isEmpty()) return@setOnCheckedStateChangeListener
@@ -50,6 +59,21 @@ class MenuFragment : Fragment() {
         }
 
         loadItems()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        updateBasketBadge()
+    }
+
+    private fun updateBasketBadge() {
+        val count = BasketService.totalItemCount()
+        if (count > 0) {
+            basketBadge.visibility = View.VISIBLE
+            basketBadge.text = if (count > 99) "99+" else count.toString()
+        } else {
+            basketBadge.visibility = View.GONE
+        }
     }
 
     private fun applyFilter(checkedChipId: Int) {
@@ -73,7 +97,7 @@ class MenuFragment : Fragment() {
         Thread {
 
             val apiHelper = ApiHelper()
-            val result = apiHelper.getItems()
+            val result = apiHelper.getItems(SessionManager.currentMenuId)
 
             requireActivity().runOnUiThread {
 
@@ -85,7 +109,9 @@ class MenuFragment : Fragment() {
                         recyclerView.visibility = View.VISIBLE
                         emptyText.visibility = View.GONE
                         allItems = result.items
+                        BasketService.setCurrentMenuItems(result.items)
                         applyFilter(filterChipGroup.checkedChipId.let { if (it != View.NO_ID) it else R.id.chipAll })
+                        updateBasketBadge()
                     }
 
                     is ApiResult.Empty -> {
@@ -93,7 +119,9 @@ class MenuFragment : Fragment() {
                         recyclerView.visibility = View.VISIBLE
                         emptyText.visibility = View.GONE
                         allItems = HagaMenuData.items
+                        BasketService.setCurrentMenuItems(HagaMenuData.items)
                         applyFilter(filterChipGroup.checkedChipId.let { if (it != View.NO_ID) it else R.id.chipAll })
+                        updateBasketBadge()
                     }
 
                     is ApiResult.Error -> {
