@@ -17,7 +17,8 @@ object HagaMenuData {
             priceIsk = 3290,
             available = true,
             tags = "meat,vegan",
-            imageData = null
+            imageData = null,
+            estimatedWaitTimeMinutes = 10
         ),
         Item(
             id = 2,
@@ -26,7 +27,8 @@ object HagaMenuData {
             priceIsk = 2690,
             available = true,
             tags = "meat,vegan",
-            imageData = null
+            imageData = null,
+            estimatedWaitTimeMinutes = 10
         ),
         Item(
             id = 3,
@@ -35,7 +37,8 @@ object HagaMenuData {
             priceIsk = 6990,
             available = true,
             tags = "meat,vegan",
-            imageData = null
+            imageData = null,
+            estimatedWaitTimeMinutes = 10
         ),
         Item(
             id = 4,
@@ -44,7 +47,8 @@ object HagaMenuData {
             priceIsk = 1590,
             available = true,
             tags = "meat,vegan",
-            imageData = null
+            imageData = null,
+            estimatedWaitTimeMinutes = 10
         ),
         // —— Borgarar (Burgers) ——
         Item(
@@ -54,7 +58,8 @@ object HagaMenuData {
             priceIsk = 1690,
             available = true,
             tags = "meat,vegan",
-            imageData = null
+            imageData = null,
+            estimatedWaitTimeMinutes = 10
         ),
         Item(
             id = 6,
@@ -63,7 +68,8 @@ object HagaMenuData {
             priceIsk = 2490,
             available = true,
             tags = "meat,vegan",
-            imageData = null
+            imageData = null,
+            estimatedWaitTimeMinutes = 10
         ),
         Item(
             id = 7,
@@ -72,7 +78,8 @@ object HagaMenuData {
             priceIsk = 1690,
             available = true,
             tags = "meat,vegan",
-            imageData = null
+            imageData = null,
+            estimatedWaitTimeMinutes = 10
         ),
         Item(
             id = 8,
@@ -81,7 +88,8 @@ object HagaMenuData {
             priceIsk = 2490,
             available = true,
             tags = "meat,vegan",
-            imageData = null
+            imageData = null,
+            estimatedWaitTimeMinutes = 10
         ),
         Item(
             id = 9,
@@ -90,7 +98,8 @@ object HagaMenuData {
             priceIsk = 1690,
             available = true,
             tags = "meat,vegan",
-            imageData = null
+            imageData = null,
+            estimatedWaitTimeMinutes = 10
         ),
         Item(
             id = 10,
@@ -99,7 +108,8 @@ object HagaMenuData {
             priceIsk = 2490,
             available = true,
             tags = "meat,vegan",
-            imageData = null
+            imageData = null,
+            estimatedWaitTimeMinutes = 10
         ),
         Item(
             id = 11,
@@ -108,7 +118,8 @@ object HagaMenuData {
             priceIsk = 1390,
             available = true,
             tags = "meat,vegan",
-            imageData = null
+            imageData = null,
+            estimatedWaitTimeMinutes = 10
         ),
         // —— Aukavörur (Sides) ——
         Item(
@@ -118,7 +129,8 @@ object HagaMenuData {
             priceIsk = 1490,
             available = true,
             tags = "vegan",
-            imageData = null
+            imageData = null,
+            estimatedWaitTimeMinutes = 10
         ),
         Item(
             id = 13,
@@ -127,7 +139,8 @@ object HagaMenuData {
             priceIsk = 790,
             available = true,
             tags = "vegan",
-            imageData = null
+            imageData = null,
+            estimatedWaitTimeMinutes = 10
         ),
         Item(
             id = 14,
@@ -136,7 +149,8 @@ object HagaMenuData {
             priceIsk = 1690,
             available = true,
             tags = "vegan",
-            imageData = null
+            imageData = null,
+            estimatedWaitTimeMinutes = 10
         ),
         Item(
             id = 15,
@@ -145,7 +159,8 @@ object HagaMenuData {
             priceIsk = 1490,
             available = true,
             tags = "vegan",
-            imageData = null
+            imageData = null,
+            estimatedWaitTimeMinutes = 10
         ),
         Item(
             id = 16,
@@ -154,7 +169,8 @@ object HagaMenuData {
             priceIsk = 1490,
             available = true,
             tags = "vegan",
-            imageData = null
+            imageData = null,
+            estimatedWaitTimeMinutes = 10
         ),
         Item(
             id = 17,
@@ -163,7 +179,8 @@ object HagaMenuData {
             priceIsk = 390,
             available = true,
             tags = "",
-            imageData = null
+            imageData = null,
+            estimatedWaitTimeMinutes = 10
         ),
         // —— Drykkir (Drinks) ——
         Item(
@@ -173,7 +190,8 @@ object HagaMenuData {
             priceIsk = 390,
             available = true,
             tags = "vegan",
-            imageData = null
+            imageData = null,
+            estimatedWaitTimeMinutes = 10
         ),
         Item(
             id = 19,
@@ -182,7 +200,8 @@ object HagaMenuData {
             priceIsk = 290,
             available = true,
             tags = "vegan",
-            imageData = null
+            imageData = null,
+            estimatedWaitTimeMinutes = 10
         )
     )
 }

@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">Whoops.mobile</string>
     <string name="wait_time_minutes">~%d min</string>
+    <string name="filter_all">All</string>
+    <string name="filter_vegetarian">Vegetarian</string>
+    <string name="filter_meat">Meat</string>
 </resources>
