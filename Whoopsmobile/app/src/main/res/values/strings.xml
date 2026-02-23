@@ -4,4 +4,5 @@
     <string name="filter_all">All</string>
     <string name="filter_vegetarian">Vegetarian</string>
     <string name="filter_meat">Meat</string>
+    <string name="no_items_match_filter">No items match this filter</string>
 </resources>

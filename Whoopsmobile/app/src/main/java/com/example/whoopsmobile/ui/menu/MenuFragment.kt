@@ -59,6 +59,13 @@ class MenuFragment : Fragment() {
             else -> allItems // chipAll or unknown
         }
         adapter.updateItems(filtered)
+        // Show message when filter returns no items (e.g. tags missing in Supabase)
+        if (filtered.isEmpty() && checkedChipId != R.id.chipAll) {
+            emptyText.text = getString(R.string.no_items_match_filter)
+            emptyText.visibility = View.VISIBLE
+        } else {
+            emptyText.visibility = View.GONE
+        }
     }
 
     private fun loadItems() {
