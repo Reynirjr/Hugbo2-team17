@@ -12,6 +12,7 @@ object SessionManager {
     private const val PREFS_NAME = "whoops_session"
     private const val KEY_PHONE = "customer_phone"
     private const val KEY_MENU_ID = "current_menu_id"
+    private const val KEY_QUEUE_MINUTES = "restaurant_queue_minutes"
 
     private var prefs: SharedPreferences? = null
 
@@ -28,6 +29,11 @@ object SessionManager {
     var currentMenuId: Long
         get() = requirePrefs().getLong(KEY_MENU_ID, 1L)
         set(value) = requirePrefs().edit().putLong(KEY_MENU_ID, value).apply()
+
+    /** Restaurant/store queue minutes (from store_settings). Used for order estimated_ready_at and wait time display. */
+    var restaurantQueueMinutes: Int?
+        get() = requirePrefs().getInt(KEY_QUEUE_MINUTES, -1).takeIf { it >= 0 }
+        set(value) = requirePrefs().edit().putInt(KEY_QUEUE_MINUTES, value ?: -1).apply()
 
     fun isLoggedIn(): Boolean = !customerPhone.isNullOrBlank()
 

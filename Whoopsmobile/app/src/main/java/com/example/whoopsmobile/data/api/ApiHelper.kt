@@ -132,6 +132,28 @@ class ApiHelper {
         }
     }
 
+    /** Fetches store queue minutes (restaurant-level estimated wait). Returns null on failure. */
+    fun getStoreQueueMinutes(): Int? {
+        return try {
+            val url = URL("${ApiConstants.SUPABASE_URL}/rest/v1/store_settings?id=eq.1&select=queue_minutes")
+            val conn = url.openConnection() as HttpURLConnection
+            conn.requestMethod = "GET"
+            conn.setRequestProperty("apikey", ApiConstants.SUPABASE_ANON_KEY)
+            conn.setRequestProperty("Authorization", "Bearer ${ApiConstants.SUPABASE_ANON_KEY}")
+            conn.setRequestProperty("Accept", "application/json")
+            val code = conn.responseCode
+            val response: String = (if (code in 200..299) conn.inputStream else conn.errorStream)
+                ?.let { BufferedReader(InputStreamReader(it)).use { r -> r.readText() } } ?: ""
+            if (code !in 200..299 || response.isBlank()) return null
+            val arr = JSONArray(response)
+            if (arr.length() == 0) return null
+            arr.getJSONObject(0).optInt("queue_minutes", -1).takeIf { it > 0 }
+        } catch (e: Exception) {
+            Log.e("API", "getStoreQueueMinutes failed", e)
+            null
+        }
+    }
+
     /** Creates order in Supabase. Returns created Order (id + status) or null on failure. */
     fun createOrder(
         customerPhone: String,
@@ -236,20 +258,38 @@ class ApiHelper {
     /** Fetches order by id (UML: getOrderStatus). Returns Order or null. */
     fun getOrderStatus(orderId: Long): Order? {
         return try {
-            val url = URL("${ApiConstants.SUPABASE_URL}/rest/v1/orders?id=eq.$orderId&select=id,status")
+            val url = URL("${ApiConstants.SUPABASE_URL}/rest/v1/orders?id=eq.$orderId&select=id,created_at,customer_phone,menu_id,status,total_isk,estimated_ready_at")
             val conn = url.openConnection() as HttpURLConnection
             conn.requestMethod = "GET"
             conn.setRequestProperty("apikey", ApiConstants.SUPABASE_ANON_KEY)
             conn.setRequestProperty("Authorization", "Bearer ${ApiConstants.SUPABASE_ANON_KEY}")
             conn.setRequestProperty("Accept", "application/json")
             val code = conn.responseCode
-            val response = if (code in 200..299) conn.inputStream else null
+            val response: String = (if (code in 200..299) conn.inputStream else conn.errorStream)
                 ?.let { BufferedReader(InputStreamReader(it)).use { r -> r.readText() } } ?: ""
-            if (code !in 200..299) return null
+            if (code !in 200..299) {
+                Log.e("API", "getOrderStatus failed $code $response")
+                return null
+            }
+            if (response.isBlank()) {
+                Log.e("API", "getOrderStatus empty response")
+                return null
+            }
             val arr = JSONArray(response)
-            if (arr.length() == 0) return null
+            if (arr.length() == 0) {
+                Log.e("API", "getOrderStatus empty array for id=$orderId")
+                return null
+            }
             val o = arr.getJSONObject(0)
-            Order(id = o.optLong("id"), status = o.optString("status", "RECEIVED"))
+            Order(
+                id = o.optLong("id"),
+                status = o.optString("status", "RECEIVED"),
+                createdAt = o.optString("created_at").takeIf { it.isNotBlank() },
+                customerPhone = o.optString("customer_phone").takeIf { it.isNotBlank() },
+                menuId = o.optLong("menu_id").takeIf { it != 0L },
+                totalIsk = o.optInt("total_isk", 0),
+                estimatedReadyAt = o.optString("estimated_ready_at").takeIf { it.isNotBlank() }
+            )
         } catch (e: Exception) {
             Log.e("API", "getOrderStatus failed", e)
             null

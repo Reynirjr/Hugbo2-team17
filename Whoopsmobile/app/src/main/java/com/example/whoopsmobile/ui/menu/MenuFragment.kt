@@ -27,6 +27,7 @@ class MenuFragment : Fragment() {
     private lateinit var emptyText: TextView
     private lateinit var filterChipGroup: ChipGroup
     private lateinit var basketBadge: TextView
+    private lateinit var tvWaitTimeHeader: TextView
 
     private var allItems: List<Item> = emptyList()
 
@@ -44,6 +45,7 @@ class MenuFragment : Fragment() {
         emptyText = view.findViewById(R.id.tvEmpty)
         filterChipGroup = view.findViewById(R.id.filterChipGroup)
         basketBadge = view.findViewById(R.id.basketBadge)
+        tvWaitTimeHeader = view.findViewById(R.id.tvWaitTimeHeader)
         val btnBasket: ImageButton = view.findViewById(R.id.btnBasket)
 
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
@@ -76,10 +78,19 @@ class MenuFragment : Fragment() {
         }
     }
 
+    private fun updateWaitTimeHeader() {
+        SessionManager.restaurantQueueMinutes?.takeIf { it > 0 }?.let { min ->
+            tvWaitTimeHeader.visibility = View.VISIBLE
+            tvWaitTimeHeader.text = getString(R.string.wait_time_minutes, min)
+        } ?: run { tvWaitTimeHeader.visibility = View.GONE }
+    }
+
     private fun applyFilter(checkedChipId: Int) {
         val filtered = when (checkedChipId) {
             R.id.chipVegetarian -> allItems.filter { it.hasTag("vegan") }
             R.id.chipMeat -> allItems.filter { it.hasTag("meat") }
+            R.id.chipSides -> allItems.filter { it.hasTag("meðlæta") }
+            R.id.chipDrinks -> allItems.filter { it.hasTag("drykkir") }
             else -> allItems // chipAll or unknown
         }
         adapter.updateItems(filtered)
@@ -98,28 +109,31 @@ class MenuFragment : Fragment() {
 
             val apiHelper = ApiHelper()
             val result = apiHelper.getItems(SessionManager.currentMenuId)
+            apiHelper.getStoreQueueMinutes()?.let { SessionManager.restaurantQueueMinutes = it }
 
             requireActivity().runOnUiThread {
 
                 when (result) {
 
                     is ApiResult.Success -> {
-                        val withWait = result.items.count { it.estimatedWaitTimeMinutes != null && it.estimatedWaitTimeMinutes!! > 0 }
-                        Log.d("MenuFragment", "API Success: ${result.items.size} items, $withWait with wait time")
+                        Log.d("MenuFragment", "API Success: ${result.items.size} items")
                         recyclerView.visibility = View.VISIBLE
                         emptyText.visibility = View.GONE
                         allItems = result.items
                         BasketService.setCurrentMenuItems(result.items)
+                        updateWaitTimeHeader()
                         applyFilter(filterChipGroup.checkedChipId.let { if (it != View.NO_ID) it else R.id.chipAll })
                         updateBasketBadge()
                     }
 
                     is ApiResult.Empty -> {
-                        Log.d("MenuFragment", "API Empty: using fallback HagaMenuData (has wait times)")
+                        Log.d("MenuFragment", "API Empty: using fallback HagaMenuData")
+                        if (SessionManager.restaurantQueueMinutes == null) SessionManager.restaurantQueueMinutes = 20
                         recyclerView.visibility = View.VISIBLE
                         emptyText.visibility = View.GONE
                         allItems = HagaMenuData.items
                         BasketService.setCurrentMenuItems(HagaMenuData.items)
+                        updateWaitTimeHeader()
                         applyFilter(filterChipGroup.checkedChipId.let { if (it != View.NO_ID) it else R.id.chipAll })
                         updateBasketBadge()
                     }
@@ -132,10 +146,12 @@ class MenuFragment : Fragment() {
 
                     is ApiResult.Restaurants -> {
                         // getItems() does not return Restaurants; treat as empty
+                        if (SessionManager.restaurantQueueMinutes == null) SessionManager.restaurantQueueMinutes = 20
                         recyclerView.visibility = View.VISIBLE
                         emptyText.visibility = View.GONE
                         allItems = HagaMenuData.items
                         BasketService.setCurrentMenuItems(HagaMenuData.items)
+                        updateWaitTimeHeader()
                         applyFilter(filterChipGroup.checkedChipId.let { if (it != View.NO_ID) it else R.id.chipAll })
                         updateBasketBadge()
                     }

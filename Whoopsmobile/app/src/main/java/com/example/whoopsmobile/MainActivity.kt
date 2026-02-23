@@ -1,6 +1,8 @@
 package com.example.whoopsmobile
 
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -10,6 +12,7 @@ import com.example.whoopsmobile.ui.basket.BasketFragment
 import com.example.whoopsmobile.ui.checkout.CheckoutFragment
 import com.example.whoopsmobile.ui.itemdetails.ItemDetailsFragment
 import com.example.whoopsmobile.ui.menu.MenuFragment
+import com.example.whoopsmobile.ui.orderstatus.OrderStatusFragment
 import com.example.whoopsmobile.ui.phone.PhoneFragment
 import com.example.whoopsmobile.ui.restaurantlist.RestaurantListFragment
 
@@ -41,17 +44,41 @@ class MainActivity : AppCompatActivity() {
             .commit()
     }
 
-    /** After placing order: go to restaurant list and clear back stack. */
+    /** After placing order: clear back stack and show order status screen. */
+    fun openOrderStatusClearBackStack(orderId: Long) {
+        Handler(Looper.getMainLooper()).post {
+            try {
+                supportFragmentManager.popBackStack(null, androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE)
+                supportFragmentManager.beginTransaction()
+                    .replace(R.id.main, OrderStatusFragment.newInstance(orderId))
+                    .addToBackStack(null)
+                    .commitAllowingStateLoss()
+            } catch (e: Exception) {
+                try {
+                    supportFragmentManager.beginTransaction()
+                        .replace(R.id.main, OrderStatusFragment.newInstance(orderId))
+                        .addToBackStack(null)
+                        .commitAllowingStateLoss()
+                } catch (_: Exception) { }
+            }
+        }
+    }
+
+    /** From order status screen: go to restaurant list and clear back stack. */
     fun openRestaurantListClearBackStack() {
-        try {
-            supportFragmentManager.popBackStack(null, androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE)
-            supportFragmentManager.beginTransaction()
-                .replace(R.id.main, RestaurantListFragment())
-                .commitAllowingStateLoss()
-        } catch (e: Exception) {
-            supportFragmentManager.beginTransaction()
-                .replace(R.id.main, RestaurantListFragment())
-                .commitAllowingStateLoss()
+        Handler(Looper.getMainLooper()).post {
+            try {
+                supportFragmentManager.popBackStack(null, androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE)
+                supportFragmentManager.beginTransaction()
+                    .replace(R.id.main, RestaurantListFragment())
+                    .commitAllowingStateLoss()
+            } catch (e: Exception) {
+                try {
+                    supportFragmentManager.beginTransaction()
+                        .replace(R.id.main, RestaurantListFragment())
+                        .commitAllowingStateLoss()
+                } catch (_: Exception) { }
+            }
         }
     }
 

@@ -71,6 +71,15 @@
                 android:textSize="14sp"
                 android:textColor="#F6F4E4"
                 android:layout_marginTop="4dp"/>
+
+            <TextView
+                android:id="@+id/tvWaitTimeHeader"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:textSize="13sp"
+                android:textColor="#F6F4E4"
+                android:visibility="gone"/>
         </LinearLayout>
     </LinearLayout>
 
@@ -108,6 +117,20 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/filter_meat"/>
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chipSides"
+            style="@style/Widget.MaterialComponents.Chip.Choice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/filter_sides"/>
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chipDrinks"
+            style="@style/Widget.MaterialComponents.Chip.Choice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/filter_drinks"/>
     </com.google.android.material.chip.ChipGroup>
 
     <!-- Empty State -->

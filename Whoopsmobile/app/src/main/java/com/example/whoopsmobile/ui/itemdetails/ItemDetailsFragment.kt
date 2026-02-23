@@ -21,7 +21,6 @@ class ItemDetailsFragment : Fragment() {
     private lateinit var tvItemName: TextView
     private lateinit var tvItemDescription: TextView
     private lateinit var tvItemPrice: TextView
-    private lateinit var tvWaitTime: TextView
     private lateinit var tvQuantity: TextView
     private lateinit var btnDecrease: ImageButton
     private lateinit var btnIncrease: ImageButton
@@ -39,7 +38,6 @@ class ItemDetailsFragment : Fragment() {
         tvItemName = view.findViewById(R.id.tvItemName)
         tvItemDescription = view.findViewById(R.id.tvItemDescription)
         tvItemPrice = view.findViewById(R.id.tvItemPrice)
-        tvWaitTime = view.findViewById(R.id.tvWaitTime)
         tvQuantity = view.findViewById(R.id.tvQuantity)
         btnDecrease = view.findViewById(R.id.btnDecrease)
         btnIncrease = view.findViewById(R.id.btnIncrease)
@@ -58,10 +56,6 @@ class ItemDetailsFragment : Fragment() {
         tvItemName.text = item.name
         tvItemDescription.text = item.description
         tvItemPrice.text = "${item.priceIsk} ISK"
-        item.estimatedWaitTimeMinutes?.takeIf { it > 0 }?.let { min ->
-            tvWaitTime.visibility = View.VISIBLE
-            tvWaitTime.text = getString(R.string.wait_time_minutes, min)
-        } ?: run { tvWaitTime.visibility = View.GONE }
 
         quantity = 1
         tvQuantity.text = quantity.toString()

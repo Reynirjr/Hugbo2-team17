@@ -25,8 +25,9 @@ object OrderService {
         val basket = BasketService.getBasket()
         if (basket.items.isEmpty()) return null
         val totalIsk = BasketService.calculateTotal()
+        val queueMinutes = SessionManager.restaurantQueueMinutes ?: DEFAULT_QUEUE_MINUTES
         val cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
-        cal.add(Calendar.MINUTE, DEFAULT_QUEUE_MINUTES)
+        cal.add(Calendar.MINUTE, queueMinutes)
         val estimatedReadyAt = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US).apply { timeZone = TimeZone.getTimeZone("UTC") }.format(cal.time)
         val lines = basket.items.map { bi ->
             OrderLine(
