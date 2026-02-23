@@ -1,5 +1,6 @@
 package com.example.whoopsmobile.data.api
 
+import com.example.whoopsmobile.BuildConfig
 import android.util.Log
 import com.example.whoopsmobile.model.Item
 import org.json.JSONArray
@@ -10,8 +11,8 @@ import java.net.HttpURLConnection
 import java.net.URL
 
 object ApiConstants {
-    const val SUPABASE_URL = "https://jomjklhroehwripfoift.supabase.co"
-    const val SUPABASE_ANON_KEY = "REDACTED_SUPABASE_ANON_KEY"
+    val SUPABASE_URL: String get() = BuildConfig.SUPABASE_URL
+    val SUPABASE_ANON_KEY: String get() = BuildConfig.SUPABASE_ANON_KEY
 }
 
 class ApiHelper {
@@ -27,18 +28,30 @@ class ApiHelper {
             connection.setRequestProperty("Authorization", "Bearer ${ApiConstants.SUPABASE_ANON_KEY}")
             connection.setRequestProperty("Accept", "application/json")
 
-            if (connection.responseCode != 200) {
-                return ApiResult.Error("Server error: ${connection.responseCode}")
+            val responseCode = connection.responseCode
+            val stream = if (responseCode in 200..299) connection.inputStream else connection.errorStream
+            val response = stream?.let { BufferedReader(InputStreamReader(it)).use { r -> r.readText() } } ?: ""
+            Log.d("API", "Response code: $responseCode body: ${response.take(500)}")
+
+            if (responseCode != 200) {
+                val msg = try {
+                    if (response.trimStart().startsWith("{")) {
+                        JSONObject(response).optString("message", response)
+                    } else response
+                } catch (_: Exception) { response }
+                return ApiResult.Error("Server $responseCode: ${msg.ifEmpty { "check logcat" } }")
             }
 
-            val reader = BufferedReader(InputStreamReader(connection.inputStream))
-            val response = reader.readText()
-            reader.close()
-            Log.d("API_RESPONSE", response)
-            val trimmed = response.trim()
-
             val items = mutableListOf<Item>()
-            val menusArray = JSONArray(response)
+            if (response.isBlank()) {
+                return ApiResult.Empty
+            }
+            val menusArray = try {
+                JSONArray(response)
+            } catch (e: Exception) {
+                Log.e("API", "Parse failed for: ${response.take(200)}", e)
+                return ApiResult.Error("Invalid response")
+            }
 
             if (menusArray.length() == 0) {
                 return ApiResult.Empty
@@ -74,7 +87,8 @@ class ApiHelper {
             }
 
         } catch (e: Exception) {
-            ApiResult.Error("Network error")
+            Log.e("API", "getItems failed", e)
+            ApiResult.Error("Error: ${e.message ?: "check logcat"}")
         }
     }
 }

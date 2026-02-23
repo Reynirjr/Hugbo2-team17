@@ -2,10 +2,18 @@ plugins {
     alias(libs.plugins.android.application)
 }
 
+val localProperties = java.util.Properties().apply {
+    rootProject.file("local.properties").takeIf { it.exists() }?.inputStream()?.use { load(it) }
+}
+
 android {
     namespace = "com.example.whoopsmobile"
     compileSdk {
         version = release(36)
+    }
+
+    buildFeatures {
+        buildConfig = true
     }
 
     defaultConfig {
@@ -16,6 +24,17 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField(
+            "String",
+            "SUPABASE_URL",
+            "\"${localProperties.getProperty("supabase.url", "")}\""
+        )
+        buildConfigField(
+            "String",
+            "SUPABASE_ANON_KEY",
+            "\"${localProperties.getProperty("supabase.anonKey", "")}\""
+        )
     }
 
     buildTypes {
