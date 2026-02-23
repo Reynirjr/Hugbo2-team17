@@ -7,5 +7,6 @@ data class Item(
     val priceIsk: Int,
     val available: Boolean,
     val tags: String,
-    val imageData: String?
+    val imageData: String?,
+    val estimatedWaitTimeMinutes: Int? = null
 )

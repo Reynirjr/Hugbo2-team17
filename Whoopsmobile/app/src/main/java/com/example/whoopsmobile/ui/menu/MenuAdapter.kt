@@ -17,6 +17,7 @@ class MenuAdapter(
         val name: TextView = view.findViewById(R.id.tvName)
         val description: TextView = view.findViewById(R.id.tvDescription)
         val price: TextView = view.findViewById(R.id.tvPrice)
+        val waitTime: TextView = view.findViewById(R.id.tvWaitTime)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MenuViewHolder {
@@ -30,6 +31,13 @@ class MenuAdapter(
         holder.name.text = item.name
         holder.description.text = item.description
         holder.price.text = "${item.priceIsk} ISK"
+        val minutes = item.estimatedWaitTimeMinutes
+        if (minutes != null && minutes > 0) {
+            holder.waitTime.visibility = View.VISIBLE
+            holder.waitTime.text = holder.itemView.context.getString(R.string.wait_time_minutes, minutes)
+        } else {
+            holder.waitTime.visibility = View.GONE
+        }
     }
 
     override fun getItemCount(): Int = items.size

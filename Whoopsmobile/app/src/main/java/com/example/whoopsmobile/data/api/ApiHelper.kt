@@ -74,7 +74,8 @@ class ApiHelper {
                             priceIsk = itemObj.optInt("price_isk", itemObj.optInt("priceIsk", 0)),
                             available = itemObj.optBoolean("available", true),
                             tags = itemObj.optString("tags", ""),
-                            imageData = null
+                            imageData = null,
+                            estimatedWaitTimeMinutes = itemObj.optInt("estimated_wait_time_minutes", 0).takeIf { it > 0 }
                         )
                     )
                 }

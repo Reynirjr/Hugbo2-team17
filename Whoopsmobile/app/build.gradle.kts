@@ -1,9 +1,13 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
 }
 
-val localProperties = java.util.Properties().apply {
-    rootProject.file("local.properties").takeIf { it.exists() }?.inputStream()?.use { load(it) }
+val localProperties = Properties().apply {
+    rootProject.file("local.properties").takeIf { it.exists() }?.inputStream()?.use { input ->
+        load(input)
+    }
 }
 
 android {

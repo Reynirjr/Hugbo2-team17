@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Whoops.mobile</string>
+    <string name="wait_time_minutes">~%d min</string>
 </resources>
