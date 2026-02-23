@@ -3,6 +3,7 @@ package com.example.whoopsmobile.data.api
 import com.example.whoopsmobile.BuildConfig
 import android.util.Log
 import com.example.whoopsmobile.model.Item
+import com.example.whoopsmobile.model.Order
 import com.example.whoopsmobile.model.Restaurant
 import org.json.JSONArray
 import org.json.JSONObject
@@ -21,7 +22,7 @@ class ApiHelper {
 
     companion object {
         fun fallbackRestaurants(): List<Restaurant> = listOf(
-            Restaurant(id = 1L, name = "Haga-vagninn", menuId = 1L, imageUrl = null)
+            Restaurant(id = 1L, name = "Haga-vagninn", menuId = 1L, imageUrl = "restaurant-logo/Hagavagninn-Logo-hvitt.png")
         )
     }
 
@@ -110,8 +111,8 @@ class ApiHelper {
             connection.setRequestProperty("Authorization", "Bearer ${ApiConstants.SUPABASE_ANON_KEY}")
             connection.setRequestProperty("Accept", "application/json")
             val responseCode = connection.responseCode
-            val response = if (responseCode in 200..299) connection.inputStream else connection.errorStream
-                ?.let { BufferedReader(InputStreamReader(it)).use { r -> r.readText() } } ?: ""
+            val stream = if (responseCode in 200..299) connection.inputStream else connection.errorStream
+            val response = stream?.let { BufferedReader(InputStreamReader(it)).use { r -> r.readText() } } ?: ""
             if (responseCode != 200) return ApiResult.Error("$responseCode")
             if (response.isBlank()) return ApiResult.Restaurants(emptyList())
             val arr = JSONArray(response)
@@ -131,14 +132,14 @@ class ApiHelper {
         }
     }
 
-    /** Creates order in Supabase. Returns order id or null on failure. */
+    /** Creates order in Supabase. Returns created Order (id + status) or null on failure. */
     fun createOrder(
         customerPhone: String,
         menuId: Long,
         totalIsk: Int,
         estimatedReadyAt: String?,
         items: List<OrderLine>
-    ): Long? {
+    ): Order? {
         return try {
             val orderBody = JSONObject().apply {
                 put("customer_phone", customerPhone)
@@ -157,15 +158,17 @@ class ApiHelper {
             conn.setRequestProperty("Prefer", "return=representation")
             OutputStreamWriter(conn.outputStream).use { it.write(orderBody.toString()) }
             val code = conn.responseCode
-            val response = if (code in 200..299) conn.inputStream else conn.errorStream
+            val response: String = (if (code in 200..299) conn.inputStream else conn.errorStream)
                 ?.let { BufferedReader(InputStreamReader(it)).use { r -> r.readText() } } ?: ""
             if (code !in 200..299) {
                 Log.e("API", "createOrder failed $code $response")
                 return null
             }
-            val created = JSONArray(response)
-            if (created.length() == 0) return null
-            val orderId = created.getJSONObject(0).getLong("id")
+            val orderId = parseOrderIdFromResponse(response)
+            if (orderId == null || orderId <= 0L) {
+                Log.e("API", "createOrder: could not parse order id from response: ${response.take(300)}")
+                return null
+            }
             for (line in items) {
                 val lineBody = JSONObject().apply {
                     put("order_id", orderId)
@@ -186,9 +189,69 @@ class ApiHelper {
                     Log.e("API", "createOrder order_items failed ${lineConn.responseCode}")
                 }
             }
-            orderId
+            val status = parseOrderStatusFromResponse(response) ?: "RECEIVED"
+            Order(id = orderId, status = status)
         } catch (e: Exception) {
             Log.e("API", "createOrder failed", e)
+            null
+        }
+    }
+
+    /** Parse order id from PostgREST response: array [{ "id": ... }] or single object { "id": ... }. */
+    private fun parseOrderIdFromResponse(response: String): Long? {
+        if (response.isBlank()) return null
+        return try {
+            val trimmed = response.trim()
+            when {
+                trimmed.startsWith("[") -> {
+                    val arr = JSONArray(response)
+                    if (arr.length() == 0) null else arr.getJSONObject(0).optLong("id").takeIf { it != 0L }
+                }
+                trimmed.startsWith("{") -> {
+                    JSONObject(response).optLong("id").takeIf { it != 0L }
+                }
+                else -> null
+            }
+        } catch (e: Exception) {
+            Log.e("API", "parseOrderIdFromResponse failed: ${response.take(200)}", e)
+            null
+        }
+    }
+
+    private fun parseOrderStatusFromResponse(response: String): String? {
+        if (response.isBlank()) return null
+        return try {
+            val trimmed = response.trim()
+            when {
+                trimmed.startsWith("[") -> {
+                    val arr = JSONArray(response)
+                    if (arr.length() == 0) null else arr.getJSONObject(0).optString("status").takeIf { it.isNotBlank() }
+                }
+                trimmed.startsWith("{") -> JSONObject(response).optString("status").takeIf { it.isNotBlank() }
+                else -> null
+            }
+        } catch (_: Exception) { null }
+    }
+
+    /** Fetches order by id (UML: getOrderStatus). Returns Order or null. */
+    fun getOrderStatus(orderId: Long): Order? {
+        return try {
+            val url = URL("${ApiConstants.SUPABASE_URL}/rest/v1/orders?id=eq.$orderId&select=id,status")
+            val conn = url.openConnection() as HttpURLConnection
+            conn.requestMethod = "GET"
+            conn.setRequestProperty("apikey", ApiConstants.SUPABASE_ANON_KEY)
+            conn.setRequestProperty("Authorization", "Bearer ${ApiConstants.SUPABASE_ANON_KEY}")
+            conn.setRequestProperty("Accept", "application/json")
+            val code = conn.responseCode
+            val response = if (code in 200..299) conn.inputStream else null
+                ?.let { BufferedReader(InputStreamReader(it)).use { r -> r.readText() } } ?: ""
+            if (code !in 200..299) return null
+            val arr = JSONArray(response)
+            if (arr.length() == 0) return null
+            val o = arr.getJSONObject(0)
+            Order(id = o.optLong("id"), status = o.optString("status", "RECEIVED"))
+        } catch (e: Exception) {
+            Log.e("API", "getOrderStatus failed", e)
             null
         }
     }

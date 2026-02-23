@@ -43,10 +43,16 @@ class MainActivity : AppCompatActivity() {
 
     /** After placing order: go to restaurant list and clear back stack. */
     fun openRestaurantListClearBackStack() {
-        supportFragmentManager.popBackStack(null, androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE)
-        supportFragmentManager.beginTransaction()
-            .replace(R.id.main, RestaurantListFragment())
-            .commit()
+        try {
+            supportFragmentManager.popBackStack(null, androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE)
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.main, RestaurantListFragment())
+                .commitAllowingStateLoss()
+        } catch (e: Exception) {
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.main, RestaurantListFragment())
+                .commitAllowingStateLoss()
+        }
     }
 
     fun openMenu(menuId: Long) {

@@ -63,12 +63,14 @@ class CheckoutFragment : Fragment() {
         SessionManager.customerPhone = phone
         requireView().findViewById<Button>(R.id.btnConfirmOrder).isEnabled = false
         Thread {
-            val orderId = OrderService.createOrder()
+            val order = OrderService.createOrder()
             requireActivity().runOnUiThread {
-                requireView().findViewById<Button>(R.id.btnConfirmOrder).isEnabled = true
-                if (orderId != null) {
+                if (!isAdded) return@runOnUiThread
+                view?.findViewById<Button>(R.id.btnConfirmOrder)?.isEnabled = true
+                if (order != null) {
                     BasketService.clearBasket()
-                    Toast.makeText(requireContext(), getString(R.string.order_placed), Toast.LENGTH_LONG).show()
+                    val statusMessage = getString(R.string.order_placed) + " (${order.status})"
+                    Toast.makeText(requireContext(), statusMessage, Toast.LENGTH_LONG).show()
                     (activity as? MainActivity)?.openRestaurantListClearBackStack()
                 } else {
                     Toast.makeText(requireContext(), getString(R.string.order_error), Toast.LENGTH_LONG).show()

@@ -129,6 +129,16 @@ class MenuFragment : Fragment() {
                         emptyText.visibility = View.VISIBLE
                         emptyText.text = result.message
                     }
+
+                    is ApiResult.Restaurants -> {
+                        // getItems() does not return Restaurants; treat as empty
+                        recyclerView.visibility = View.VISIBLE
+                        emptyText.visibility = View.GONE
+                        allItems = HagaMenuData.items
+                        BasketService.setCurrentMenuItems(HagaMenuData.items)
+                        applyFilter(filterChipGroup.checkedChipId.let { if (it != View.NO_ID) it else R.id.chipAll })
+                        updateBasketBadge()
+                    }
                 }
             }
 

@@ -6,6 +6,8 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import coil.load
+import com.example.whoopsmobile.BuildConfig
 import com.example.whoopsmobile.R
 import com.example.whoopsmobile.model.Restaurant
 
@@ -33,7 +35,9 @@ class RestaurantAdapter(
         holder.name.text = r.name
         if (r.imageUrl != null && r.imageUrl.isNotBlank()) {
             holder.image.visibility = View.VISIBLE
-            // TODO: load image from r.imageUrl (Coil/Glide) when you add dependency
+            val fullUrl = if (r.imageUrl.startsWith("http")) r.imageUrl
+                else "${BuildConfig.SUPABASE_URL}/storage/v1/object/public/${r.imageUrl}"
+            holder.image.load(fullUrl)
         } else {
             holder.image.visibility = View.GONE
         }

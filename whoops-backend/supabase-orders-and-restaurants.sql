@@ -64,9 +64,11 @@ DROP POLICY IF EXISTS "Allow anon read store_settings" ON store_settings;
 CREATE POLICY "Allow anon read store_settings" ON store_settings FOR SELECT TO anon USING (true);
 
 -- Seed: one restaurant (Hagavagninn) using existing menu id 1
+-- image_url = path in Storage bucket "restaurant-logo" (file: Hagavagninn-Logo-hvitt.png).
+-- In Supabase: Storage → restaurant-logo → make bucket Public so the app can load the image.
 INSERT INTO restaurants (id, name, menu_id, image_url) VALUES
-  (1, 'Haga-vagninn', 1, NULL)
-ON CONFLICT (id) DO NOTHING;
+  (1, 'Haga-vagninn', 1, 'restaurant-logo/Hagavagninn-Logo-hvitt.png')
+ON CONFLICT (id) DO UPDATE SET image_url = EXCLUDED.image_url;
 
 INSERT INTO store_settings (id, queue_minutes) VALUES (1, 20)
 ON CONFLICT (id) DO NOTHING;

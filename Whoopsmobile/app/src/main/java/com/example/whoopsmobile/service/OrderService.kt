@@ -2,6 +2,7 @@ package com.example.whoopsmobile.service
 
 import com.example.whoopsmobile.data.api.ApiHelper
 import com.example.whoopsmobile.data.api.OrderLine
+import com.example.whoopsmobile.model.Order
 import java.util.Calendar
 import java.util.TimeZone
 import java.text.SimpleDateFormat
@@ -9,15 +10,16 @@ import java.util.Locale
 
 /**
  * US3: Place order. Creates order in Supabase with customer_phone, menu_id, items, total, estimated_ready_at.
+ * UML: OrderService createOrder(basket, phone): Order; getOrderStatus(orderId): Order.
  */
 object OrderService {
 
     private const val DEFAULT_QUEUE_MINUTES = 20
 
     /**
-     * Creates order from current basket. Returns order id or null on failure.
+     * Creates order from current basket. Returns Order (id + status) or null on failure.
      */
-    fun createOrder(): Long? {
+    fun createOrder(): Order? {
         val phone = SessionManager.customerPhone ?: return null
         val menuId = SessionManager.currentMenuId
         val basket = BasketService.getBasket()
@@ -36,4 +38,7 @@ object OrderService {
         }
         return ApiHelper().createOrder(phone, menuId, totalIsk, estimatedReadyAt, lines)
     }
+
+    /** Fetches order status by id (UML: getOrderStatus(orderId): Order). */
+    fun getOrderStatus(orderId: Long): Order? = ApiHelper().getOrderStatus(orderId)
 }
