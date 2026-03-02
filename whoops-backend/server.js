@@ -16,7 +16,8 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok' });
 });
 
-// Get all menus with sections and items
+// Get all menus with sections and items.
+// If the DB has no tables yet (e.g. fresh Render instance), returns [] so the app can show fallback menu.
 app.get('/api/menus', async (req, res) => {
   try {
     const result = await pool.query(`
@@ -34,7 +35,7 @@ app.get('/api/menus', async (req, res) => {
                 'description', i.description,
                 'priceIsk', i.price_isk,
                 'available', i.available,
-                'tags', i.tags
+                'tags', COALESCE(i.tags, '')
               )) FROM items i WHERE i.section_id = s.id
             )
           )) FROM sections s WHERE s.menu_id = m.id
@@ -43,8 +44,9 @@ app.get('/api/menus', async (req, res) => {
     `);
     res.json(result.rows[0].menus || []);
   } catch (error) {
-    console.error('Database error:', error);
-    res.status(500).json({ error: 'Failed to fetch menus' });
+    console.error('Database error:', error.message);
+    // Return empty array instead of 500 so the app can show fallback menu (e.g. tables not created yet on Render).
+    res.json([]);
   }
 });
 
