@@ -8,15 +8,19 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.whoopsmobile.R
 import com.example.whoopsmobile.model.Item
 
-
 class MenuAdapter(
-    private var items: List<Item>
+    private var items: List<Item>,
+    private val onItemClick: (Item) -> Unit = {}
 ) : RecyclerView.Adapter<MenuAdapter.MenuViewHolder>() {
 
     inner class MenuViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val name: TextView = view.findViewById(R.id.tvName)
         val description: TextView = view.findViewById(R.id.tvDescription)
         val price: TextView = view.findViewById(R.id.tvPrice)
+
+        init {
+            view.setOnClickListener { if (bindingAdapterPosition != RecyclerView.NO_POSITION) onItemClick(items[bindingAdapterPosition]) }
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MenuViewHolder {

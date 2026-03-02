@@ -1,85 +1,300 @@
 package com.example.whoopsmobile.data.api
 
+import com.example.whoopsmobile.BuildConfig
 import android.util.Log
 import com.example.whoopsmobile.model.Item
+import com.example.whoopsmobile.model.Order
+import com.example.whoopsmobile.model.Restaurant
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.net.HttpURLConnection
 import java.net.URL
+import java.io.OutputStreamWriter
 
 object ApiConstants {
-    const val BASE_URL = "https://hugbo2-team17.onrender.com"
+    val SUPABASE_URL: String get() = BuildConfig.SUPABASE_URL
+    val SUPABASE_ANON_KEY: String get() = BuildConfig.SUPABASE_ANON_KEY
 }
 
 class ApiHelper {
 
-    fun getItems(): ApiResult {
+    companion object {
+        fun fallbackRestaurants(): List<Restaurant> = listOf(
+            Restaurant(id = 1L, name = "Haga-vagninn", menuId = 1L, imageUrl = "restaurant-logo/Hagavagninn-Logo-hvitt.png")
+        )
+    }
+
+    fun getItems(menuId: Long = 1L): ApiResult {
 
         return try {
-            val url = URL("${ApiConstants.BASE_URL}/api/menus")
+            val query = "id=eq.$menuId&select=*,sections(*,items(*))"
+            val url = URL("${ApiConstants.SUPABASE_URL}/rest/v1/menus?$query")
             val connection = url.openConnection() as HttpURLConnection
             connection.requestMethod = "GET"
+            connection.setRequestProperty("apikey", ApiConstants.SUPABASE_ANON_KEY)
+            connection.setRequestProperty("Authorization", "Bearer ${ApiConstants.SUPABASE_ANON_KEY}")
+            connection.setRequestProperty("Accept", "application/json")
 
-            if (connection.responseCode != 200) {
-                return ApiResult.Error("Server error: ${connection.responseCode}")
-            }
+            val responseCode = connection.responseCode
+            val stream = if (responseCode in 200..299) connection.inputStream else connection.errorStream
+            val response = stream?.let { BufferedReader(InputStreamReader(it)).use { r -> r.readText() } } ?: ""
+            Log.d("API", "Response code: $responseCode body: ${response.take(500)}")
 
-            val reader = BufferedReader(InputStreamReader(connection.inputStream))
-            val response = reader.readText()
-            reader.close()
-            Log.d("API_RESPONSE", response)
-            val trimmed = response.trim()
-
-            // API returned error JSON
-            if (trimmed.startsWith("{")) {
-                val obj = JSONObject(trimmed)
-                if (obj.has("error")) {
-                    return ApiResult.Error(obj.getString("error"))
-                }
+            if (responseCode != 200) {
+                val msg = try {
+                    if (response.trimStart().startsWith("{")) {
+                        JSONObject(response).optString("message", response)
+                    } else response
+                } catch (_: Exception) { response }
+                return ApiResult.Error("Server $responseCode: ${msg.ifEmpty { "check logcat" } }")
             }
 
             val items = mutableListOf<Item>()
-            val menusArray = JSONArray(response)
+            if (response.isBlank()) {
+                return ApiResult.Empty
+            }
+            val menusArray = try {
+                JSONArray(response)
+            } catch (e: Exception) {
+                Log.e("API", "Parse failed for: ${response.take(200)}", e)
+                return ApiResult.Error("Invalid response")
+            }
 
             if (menusArray.length() == 0) {
                 return ApiResult.Empty
             }
 
             val menuObject = menusArray.getJSONObject(0)
-            val sectionsArray = menuObject.getJSONArray("sections")
+            val sectionsArray = menuObject.optJSONArray("sections") ?: return ApiResult.Empty
 
             for (i in 0 until sectionsArray.length()) {
                 val section = sectionsArray.getJSONObject(i)
-                val itemsArray = section.getJSONArray("items")
+                val itemsArray = section.optJSONArray("items") ?: continue
 
                 for (j in 0 until itemsArray.length()) {
-
                     val itemObj = itemsArray.getJSONObject(j)
-
                     items.add(
                         Item(
                             id = itemObj.getInt("id"),
                             name = itemObj.getString("name"),
-                            description = itemObj.getString("description"),
-                            priceIsk = itemObj.getInt("priceIsk"),
-                            available = itemObj.getBoolean("available"),
-                            tags = itemObj.getString("tags"),
-                            imageData = null
+                            description = itemObj.optString("description", ""),
+                            priceIsk = itemObj.optInt("price_isk", itemObj.optInt("priceIsk", 0)),
+                            available = itemObj.optBoolean("available", true),
+                            tags = itemObj.optString("tags", ""),
+                            imageData = null,
+                            estimatedWaitTimeMinutes = itemObj.optInt("estimated_wait_time_minutes", 0).takeIf { it > 0 }
                         )
                     )
                 }
             }
 
             if (items.isEmpty()) {
-                ApiResult.Empty
+                return ApiResult.Empty
             } else {
-                ApiResult.Success(items)
+                return ApiResult.Success(items)
             }
 
         } catch (e: Exception) {
-            ApiResult.Error("Network error")
+            Log.e("API", "getItems failed", e)
+            ApiResult.Error("Error: ${e.message ?: "check logcat"}")
+        }
+    }
+
+    fun getRestaurants(): ApiResult {
+        return try {
+            val url = URL("${ApiConstants.SUPABASE_URL}/rest/v1/restaurants?select=*")
+            val connection = url.openConnection() as HttpURLConnection
+            connection.requestMethod = "GET"
+            connection.setRequestProperty("apikey", ApiConstants.SUPABASE_ANON_KEY)
+            connection.setRequestProperty("Authorization", "Bearer ${ApiConstants.SUPABASE_ANON_KEY}")
+            connection.setRequestProperty("Accept", "application/json")
+            val responseCode = connection.responseCode
+            val stream = if (responseCode in 200..299) connection.inputStream else connection.errorStream
+            val response = stream?.let { BufferedReader(InputStreamReader(it)).use { r -> r.readText() } } ?: ""
+            if (responseCode != 200) return ApiResult.Error("$responseCode")
+            if (response.isBlank()) return ApiResult.Restaurants(emptyList())
+            val arr = JSONArray(response)
+            val list = (0 until arr.length()).map { i ->
+                val o = arr.getJSONObject(i)
+                Restaurant(
+                    id = o.getLong("id"),
+                    name = o.getString("name"),
+                    menuId = o.getLong("menu_id"),
+                    imageUrl = o.optString("image_url").takeIf { it.isNotBlank() }
+                )
+            }
+            ApiResult.Restaurants(list)
+        } catch (e: Exception) {
+            Log.e("API", "getRestaurants failed", e)
+            ApiResult.Error("Error: ${e.message ?: "check logcat"}")
+        }
+    }
+
+    /** Fetches store queue minutes (restaurant-level estimated wait). Returns null on failure. */
+    fun getStoreQueueMinutes(): Int? {
+        return try {
+            val url = URL("${ApiConstants.SUPABASE_URL}/rest/v1/store_settings?id=eq.1&select=queue_minutes")
+            val conn = url.openConnection() as HttpURLConnection
+            conn.requestMethod = "GET"
+            conn.setRequestProperty("apikey", ApiConstants.SUPABASE_ANON_KEY)
+            conn.setRequestProperty("Authorization", "Bearer ${ApiConstants.SUPABASE_ANON_KEY}")
+            conn.setRequestProperty("Accept", "application/json")
+            val code = conn.responseCode
+            val response: String = (if (code in 200..299) conn.inputStream else conn.errorStream)
+                ?.let { BufferedReader(InputStreamReader(it)).use { r -> r.readText() } } ?: ""
+            if (code !in 200..299 || response.isBlank()) return null
+            val arr = JSONArray(response)
+            if (arr.length() == 0) return null
+            arr.getJSONObject(0).optInt("queue_minutes", -1).takeIf { it > 0 }
+        } catch (e: Exception) {
+            Log.e("API", "getStoreQueueMinutes failed", e)
+            null
+        }
+    }
+
+    /** Creates order in Supabase. Returns created Order (id + status) or null on failure. */
+    fun createOrder(
+        customerPhone: String,
+        menuId: Long,
+        totalIsk: Int,
+        estimatedReadyAt: String?,
+        items: List<OrderLine>
+    ): Order? {
+        return try {
+            val orderBody = JSONObject().apply {
+                put("customer_phone", customerPhone)
+                put("menu_id", menuId)
+                put("status", "RECEIVED")
+                put("total_isk", totalIsk)
+                if (estimatedReadyAt != null) put("estimated_ready_at", estimatedReadyAt)
+            }
+            val orderUrl = URL("${ApiConstants.SUPABASE_URL}/rest/v1/orders")
+            val conn = orderUrl.openConnection() as HttpURLConnection
+            conn.requestMethod = "POST"
+            conn.doOutput = true
+            conn.setRequestProperty("apikey", ApiConstants.SUPABASE_ANON_KEY)
+            conn.setRequestProperty("Authorization", "Bearer ${ApiConstants.SUPABASE_ANON_KEY}")
+            conn.setRequestProperty("Content-Type", "application/json")
+            conn.setRequestProperty("Prefer", "return=representation")
+            OutputStreamWriter(conn.outputStream).use { it.write(orderBody.toString()) }
+            val code = conn.responseCode
+            val response: String = (if (code in 200..299) conn.inputStream else conn.errorStream)
+                ?.let { BufferedReader(InputStreamReader(it)).use { r -> r.readText() } } ?: ""
+            if (code !in 200..299) {
+                Log.e("API", "createOrder failed $code $response")
+                return null
+            }
+            val orderId = parseOrderIdFromResponse(response)
+            if (orderId == null || orderId <= 0L) {
+                Log.e("API", "createOrder: could not parse order id from response: ${response.take(300)}")
+                return null
+            }
+            for (line in items) {
+                val lineBody = JSONObject().apply {
+                    put("order_id", orderId)
+                    put("item_id", line.itemId)
+                    put("item_name", line.itemName)
+                    put("price_isk", line.priceIsk)
+                    put("quantity", line.quantity)
+                }
+                val lineUrl = URL("${ApiConstants.SUPABASE_URL}/rest/v1/order_items")
+                val lineConn = lineUrl.openConnection() as HttpURLConnection
+                lineConn.requestMethod = "POST"
+                lineConn.doOutput = true
+                lineConn.setRequestProperty("apikey", ApiConstants.SUPABASE_ANON_KEY)
+                lineConn.setRequestProperty("Authorization", "Bearer ${ApiConstants.SUPABASE_ANON_KEY}")
+                lineConn.setRequestProperty("Content-Type", "application/json")
+                OutputStreamWriter(lineConn.outputStream).use { it.write(lineBody.toString()) }
+                if (lineConn.responseCode !in 200..299) {
+                    Log.e("API", "createOrder order_items failed ${lineConn.responseCode}")
+                }
+            }
+            val status = parseOrderStatusFromResponse(response) ?: "RECEIVED"
+            Order(id = orderId, status = status)
+        } catch (e: Exception) {
+            Log.e("API", "createOrder failed", e)
+            null
+        }
+    }
+
+    /** Parse order id from PostgREST response: array [{ "id": ... }] or single object { "id": ... }. */
+    private fun parseOrderIdFromResponse(response: String): Long? {
+        if (response.isBlank()) return null
+        return try {
+            val trimmed = response.trim()
+            when {
+                trimmed.startsWith("[") -> {
+                    val arr = JSONArray(response)
+                    if (arr.length() == 0) null else arr.getJSONObject(0).optLong("id").takeIf { it != 0L }
+                }
+                trimmed.startsWith("{") -> {
+                    JSONObject(response).optLong("id").takeIf { it != 0L }
+                }
+                else -> null
+            }
+        } catch (e: Exception) {
+            Log.e("API", "parseOrderIdFromResponse failed: ${response.take(200)}", e)
+            null
+        }
+    }
+
+    private fun parseOrderStatusFromResponse(response: String): String? {
+        if (response.isBlank()) return null
+        return try {
+            val trimmed = response.trim()
+            when {
+                trimmed.startsWith("[") -> {
+                    val arr = JSONArray(response)
+                    if (arr.length() == 0) null else arr.getJSONObject(0).optString("status").takeIf { it.isNotBlank() }
+                }
+                trimmed.startsWith("{") -> JSONObject(response).optString("status").takeIf { it.isNotBlank() }
+                else -> null
+            }
+        } catch (_: Exception) { null }
+    }
+
+    /** Fetches order by id (UML: getOrderStatus). Returns Order or null. */
+    fun getOrderStatus(orderId: Long): Order? {
+        return try {
+            val url = URL("${ApiConstants.SUPABASE_URL}/rest/v1/orders?id=eq.$orderId&select=id,created_at,customer_phone,menu_id,status,total_isk,estimated_ready_at")
+            val conn = url.openConnection() as HttpURLConnection
+            conn.requestMethod = "GET"
+            conn.setRequestProperty("apikey", ApiConstants.SUPABASE_ANON_KEY)
+            conn.setRequestProperty("Authorization", "Bearer ${ApiConstants.SUPABASE_ANON_KEY}")
+            conn.setRequestProperty("Accept", "application/json")
+            val code = conn.responseCode
+            val response: String = (if (code in 200..299) conn.inputStream else conn.errorStream)
+                ?.let { BufferedReader(InputStreamReader(it)).use { r -> r.readText() } } ?: ""
+            if (code !in 200..299) {
+                Log.e("API", "getOrderStatus failed $code $response")
+                return null
+            }
+            if (response.isBlank()) {
+                Log.e("API", "getOrderStatus empty response")
+                return null
+            }
+            val arr = JSONArray(response)
+            if (arr.length() == 0) {
+                Log.e("API", "getOrderStatus empty array for id=$orderId")
+                return null
+            }
+            val o = arr.getJSONObject(0)
+            Order(
+                id = o.optLong("id"),
+                status = o.optString("status", "RECEIVED"),
+                createdAt = o.optString("created_at").takeIf { it.isNotBlank() },
+                customerPhone = o.optString("customer_phone").takeIf { it.isNotBlank() },
+                menuId = o.optLong("menu_id").takeIf { it != 0L },
+                totalIsk = o.optInt("total_isk", 0),
+                estimatedReadyAt = o.optString("estimated_ready_at").takeIf { it.isNotBlank() }
+            )
+        } catch (e: Exception) {
+            Log.e("API", "getOrderStatus failed", e)
+            null
         }
     }
 }
+
+data class OrderLine(val itemId: Long, val itemName: String, val priceIsk: Int, val quantity: Int)
