@@ -1,45 +1,144 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:background="#F6F4E4">
 
-    <!-- Header -->
+    <!-- Header: basket (left) + title -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="#291317"
-        android:orientation="vertical"
-        android:padding="24dp"
+        android:orientation="horizontal"
+        android:padding="16dp"
+        android:gravity="center_vertical"
         android:elevation="4dp">
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Menu"
-            android:textSize="32sp"
-            android:textStyle="bold"
-            android:textColor="#F6F4E4"
-            android:layout_gravity="center_horizontal"/>
+        <FrameLayout
+            android:layout_width="48dp"
+            android:layout_height="48dp">
 
-        <TextView
+            <ImageButton
+                android:id="@+id/btnBasket"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_basket"
+                android:contentDescription="@string/basket"
+                android:scaleType="centerInside"
+                android:padding="8dp"/>
+
+            <TextView
+                android:id="@+id/basketBadge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top|end"
+                android:minWidth="18sp"
+                android:minHeight="18sp"
+                android:background="@drawable/badge_background"
+                android:gravity="center"
+                android:textColor="#291317"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:visibility="gone"
+                android:paddingStart="4dp"
+                android:paddingEnd="4dp"/>
+        </FrameLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_marginStart="8dp">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:src="@drawable/hagavagninn_logo_hvitt"
+                android:contentDescription="@string/menu"
+                android:scaleType="fitCenter"
+                android:adjustViewBounds="true"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/menu_subtitle"
+                android:textSize="14sp"
+                android:textColor="#F6F4E4"
+                android:layout_marginTop="4dp"/>
+
+            <TextView
+                android:id="@+id/tvWaitTimeHeader"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:textSize="13sp"
+                android:textColor="#F6F4E4"
+                android:visibility="gone"/>
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Filters -->
+    <com.google.android.material.chip.ChipGroup
+        android:id="@+id/filterChipGroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
+        android:paddingTop="12dp"
+        android:paddingBottom="8dp"
+        app:singleSelection="true"
+        app:selectionRequired="true"
+        app:chipSpacingHorizontal="8dp">
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chipAll"
+            style="@style/Widget.MaterialComponents.Chip.Choice"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Welcome to the Burger Place"
-            android:textSize="16sp"
-            android:textColor="#F6F4E4"
-            android:layout_marginTop="8dp"
-            android:layout_gravity="center_horizontal"/>
-    </LinearLayout>
+            android:text="@string/filter_all"
+            android:checked="true"/>
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chipVegetarian"
+            style="@style/Widget.MaterialComponents.Chip.Choice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/filter_vegetarian"/>
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chipMeat"
+            style="@style/Widget.MaterialComponents.Chip.Choice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/filter_meat"/>
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chipSides"
+            style="@style/Widget.MaterialComponents.Chip.Choice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/filter_sides"/>
+
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chipDrinks"
+            style="@style/Widget.MaterialComponents.Chip.Choice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/filter_drinks"/>
+    </com.google.android.material.chip.ChipGroup>
 
     <!-- Empty State -->
     <TextView
         android:id="@+id/tvEmpty"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Nothing on menu"
+        android:text="@string/nothing_on_menu"
         android:textSize="18sp"
         android:textStyle="bold"
         android:textColor="#555555"
