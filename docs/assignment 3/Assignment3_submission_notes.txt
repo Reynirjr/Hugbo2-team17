@@ -1,0 +1,50 @@
+Assignment 3 – Project Status & Progress Notes
+Team 17 | Submission for Canvas
+
+--------------------------------------------------------------------------------
+1. LINK TO REPOSITORY
+--------------------------------------------------------------------------------
+[ Paste your team's GitHub repo URL here, e.g. https://github.com/.../Hugbo2-team17 ]
+
+
+--------------------------------------------------------------------------------
+2. PROJECT STATUS
+--------------------------------------------------------------------------------
+Implemented so far (from codebase):
+- Restaurant list and menu browsing (US1 – View menu)
+- Basket: add items, view contents (US5 – Basket management)
+- Item details and checkout flow (US3/US4 – Place order, Confirm order)
+- Order status screen (US2 – View order status)
+- Phone / session (US6 – Login with phone number)
+- Backend integration (Supabase), BasketService, SessionManager
+
+In progress / not yet done (adjust as needed):
+- [ e.g. US7 Vegetarian filter, US8 Estimated wait time, or other items ]
+
+
+--------------------------------------------------------------------------------
+3. PROGRESS VS PROJECT PLAN (A1)
+--------------------------------------------------------------------------------
+Per our A1 plan:
+- Weeks 3–4: US1 (menu), US8 (wait time), US5 (basket), US7 (veg filter) → A2
+- Week 5: US3 (place order), US4 (confirm order)
+- Week 6: US6 (login) → A3
+
+We have [ completed / mostly completed ] the core ordering flow (menu, basket, checkout, order status) and [ have started / have ] phone login. [ Add one sentence on whether we are on track, slightly behind, or reprioritised, and what we plan to do next. ]
+
+
+--------------------------------------------------------------------------------
+4. EXCEPTIONS / NOTES
+--------------------------------------------------------------------------------
+[ Briefly list any blockers, scope changes, or decisions, e.g.:
+- Config/API key handling (e.g. local.properties, no keys in repo)
+- One feature took longer than estimated
+- Backend or tooling changes
+- Or: "No major exceptions." ]
+
+
+--------------------------------------------------------------------------------
+For the Thu 5 Mar P.O. presentation we will:
+- Explain how implementation proceeded and how far we are vs the plan
+- Describe reasons for any delays and how we are addressing them
+- Demo the newly implemented features

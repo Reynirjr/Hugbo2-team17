@@ -1,0 +1,100 @@
+\documentclass{article}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{geometry}
+\usepackage{tabularx}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{url}
+
+\geometry{a4paper, margin=1in}
+
+\title{Assignment 3 - Implementation Progress and Project Status}
+\author{Team 17 - brj46, hfd2, jjo1, ros30}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\section{Repository}
+
+\textbf{Link:} \url{https://github.com/Reynirjr/Hugbo2-team17}
+
+The implementation is on the main branch at the repository above.
+
+\section{Project Status}
+
+\subsection{Implemented}
+
+The following user stories and features have been implemented:
+
+\begin{itemize}
+    \item \textbf{US1 (View menu):} Restaurant list and menu browsing with prices and availability.
+    \item \textbf{US5 (Basket management):} Add items to basket and view basket contents.
+    \item \textbf{US3 \& US4 (Place order, Confirm order):} Item details screen and full checkout flow.
+    \item \textbf{US2 (View order status):} Order status screen showing order state.
+    \item \textbf{US6 (Login with phone number):} Phone number entry and session management.
+    \item \textbf{US7 (Vegetarian filter):} Filter menu to show only vegetarian items.
+    \item \textbf{US8 (Estimated wait time):} Estimated wait time shown before ordering.
+    \item Backend integration with Supabase; \texttt{BasketService} and \texttt{SessionManager} in place.
+\end{itemize}
+
+We have completed the core ordering flow (menu, basket, checkout, order status), phone login, vegetarian filter, and estimated wait time.
+
+\section{Progress in Relation to Plan}
+
+Per the A1 project plan, by A3 we aimed to deliver:
+
+\begin{itemize}
+    \item Weeks 3--4: US1 (menu), US8 (estimated wait time), US5 (basket), US7 (vegetarian filter).
+    \item Week 5: US3 (place order), US4 (confirm order).
+    \item Week 6: US6 (login with phone number).
+\end{itemize}
+
+All planned items for A3 are implemented and live on the main branch: US1, US5, US7, US8 (weeks 3--4), US3 and US4 (week 5), and US6 (week 6).
+
+\section{Implementation Screenshots}
+
+\subsection{Menu and restaurant list}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.45\textwidth]{menu.png}
+    \caption{Menu and restaurant browsing (US1).}
+\end{figure}
+
+\subsection{Item details and quantity}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.45\textwidth]{qty-item.png}
+    \caption{Item details and quantity selection.}
+\end{figure}
+
+\subsection{Order overview}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.45\textwidth]{overview-order.png}
+    \caption{Order overview before checkout (US4).}
+\end{figure}
+
+\subsection{Order status}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.45\textwidth]{order-status.png}
+    \caption{Order status screen (US2).}
+\end{figure}
+
+\subsection{Supabase schema}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{supabase-schema.png}
+    \caption{Backend schema (Supabase).}
+\end{figure}
+
+\end{document}
