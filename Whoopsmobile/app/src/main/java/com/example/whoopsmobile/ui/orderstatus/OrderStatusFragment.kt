@@ -1,27 +1,25 @@
 package com.example.whoopsmobile.ui.orderstatus
 
+import android.Manifest
+import android.content.Context
+import android.content.pm.PackageManager
+import android.location.Location
+import android.location.LocationManager
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.ProgressBar
-import android.widget.TextView
+import android.widget.*
 import androidx.fragment.app.Fragment
 import com.example.whoopsmobile.MainActivity
 import com.example.whoopsmobile.R
 import com.example.whoopsmobile.service.OrderService
 import java.text.SimpleDateFormat
-import java.util.Locale
-import java.util.TimeZone
+import java.util.*
 import java.util.concurrent.TimeUnit
 
-/**
- * Shows the status of a single order (UML: OrderStatusFragment, loadOrderStatus, refreshStatus).
- * Displays "Skráð" and "Áætlað klárt" as relative/countdown text that updates every minute.
- */
 class OrderStatusFragment : Fragment() {
 
     private var orderId: Long = 0L
@@ -30,9 +28,13 @@ class OrderStatusFragment : Fragment() {
     private lateinit var tvCreatedAt: TextView
     private lateinit var tvTotalIsk: TextView
     private lateinit var tvEstimatedReadyAt: TextView
+    private lateinit var tvDistance: TextView
     private lateinit var progressStatus: ProgressBar
     private lateinit var btnRefreshStatus: Button
     private lateinit var btnBackToRestaurants: Button
+
+    private val restaurantLat = 64.1456
+    private val restaurantLng = -21.9497
 
     private var createdAtMillis: Long? = null
     private var estimatedReadyAtMillis: Long? = null
@@ -64,6 +66,7 @@ class OrderStatusFragment : Fragment() {
         tvCreatedAt = view.findViewById(R.id.tvCreatedAt)
         tvTotalIsk = view.findViewById(R.id.tvTotalIsk)
         tvEstimatedReadyAt = view.findViewById(R.id.tvEstimatedReadyAt)
+        tvDistance = view.findViewById(R.id.tvDistance)
         progressStatus = view.findViewById(R.id.progressStatus)
         btnRefreshStatus = view.findViewById(R.id.btnRefreshStatus)
         btnBackToRestaurants = view.findViewById(R.id.btnBackToRestaurants)
@@ -73,12 +76,15 @@ class OrderStatusFragment : Fragment() {
         view.findViewById<View>(R.id.btnBack).setOnClickListener {
             activity?.onBackPressedDispatcher?.onBackPressed()
         }
+
         btnRefreshStatus.setOnClickListener { loadOrderStatus() }
+
         btnBackToRestaurants.setOnClickListener {
             (activity as? MainActivity)?.openRestaurantListClearBackStack()
         }
 
         loadOrderStatus()
+        checkLocationPermissionAndUpdate()
     }
 
     override fun onResume() {
@@ -103,20 +109,19 @@ class OrderStatusFragment : Fragment() {
         if (!isAdded) return
         val now = System.currentTimeMillis()
 
-        createdAtMillis?.let { created ->
-            tvCreatedAt.text = formatMinutesAgo(now - created)
+        createdAtMillis?.let {
+            tvCreatedAt.text = formatMinutesAgo(now - it)
         } ?: run { tvCreatedAt.text = "—" }
 
-        estimatedReadyAtMillis?.let { readyAt ->
-            tvEstimatedReadyAt.text = formatCountdown(readyAt - now)
+        estimatedReadyAtMillis?.let {
+            tvEstimatedReadyAt.text = formatCountdown(it - now)
         } ?: run { tvEstimatedReadyAt.text = "—" }
     }
 
     private fun formatMinutesAgo(diffMs: Long): String {
         val minutes = TimeUnit.MILLISECONDS.toMinutes(diffMs)
         return when {
-            minutes < 0 -> getString(R.string.order_time_ago_now)
-            minutes == 0L -> getString(R.string.order_time_ago_now)
+            minutes <= 0 -> getString(R.string.order_time_ago_now)
             minutes == 1L -> getString(R.string.order_time_ago_1_min)
             else -> getString(R.string.order_time_ago_minutes, minutes.toInt())
         }
@@ -131,62 +136,105 @@ class OrderStatusFragment : Fragment() {
         }
     }
 
-    private fun loadOrderStatus() {
-        if (orderId <= 0L) {
-            tvOrderStatus.text = "—"
-            return
+    private fun calculateDistanceKm(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Double {
+        val results = FloatArray(1)
+        Location.distanceBetween(lat1, lon1, lat2, lon2, results)
+        return results[0] / 1000.0
+    }
+
+    private fun updateDistance() {
+        val context = context ?: return
+        val locationManager = context.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+
+        try {
+            val location =
+                locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
+                    ?: locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
+
+            if (location != null) {
+                val distance = calculateDistanceKm(
+                    location.latitude,
+                    location.longitude,
+                    restaurantLat,
+                    restaurantLng
+                )
+
+                val text = if (distance < 1) {
+                    val meters = (distance * 1000).toInt()
+                    "Fjarlægð: $meters m frá veitingastað"
+                } else {
+                    val rounded = String.format("%.1f", distance)
+                    "Fjarlægð: $rounded km frá veitingastað"
+                }
+
+                tvDistance.text = text
+            } else {
+                tvDistance.text = "Fjarlægð: óþekkt"
+            }
+
+        } catch (e: SecurityException) {
+            tvDistance.text = "Engin staðsetningarheimild"
         }
+    }
+
+    private fun checkLocationPermissionAndUpdate() {
+        if (requireContext().checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION)
+            != PackageManager.PERMISSION_GRANTED
+        ) {
+            requestPermissions(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), 1)
+        } else {
+            updateDistance()
+        }
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        if (requestCode == 1 &&
+            grantResults.isNotEmpty() &&
+            grantResults[0] == PackageManager.PERMISSION_GRANTED
+        ) {
+            updateDistance()
+        }
+    }
+
+    private fun loadOrderStatus() {
+        if (orderId <= 0L) return
+
         progressStatus.visibility = View.VISIBLE
         tvOrderStatus.text = getString(R.string.order_status_loading)
-        tvCreatedAt.text = "—"
-        tvEstimatedReadyAt.text = "—"
+
         val act = activity
         Thread {
             val order = OrderService.getOrderStatus(orderId)
             act?.runOnUiThread {
                 if (act.isDestroyed) return@runOnUiThread
+
                 progressStatus.visibility = View.GONE
+
                 if (order != null) {
                     tvOrderStatus.text = order.status
                     tvTotalIsk.text = order.totalIsk?.let { "$it ISK" } ?: "—"
                     createdAtMillis = order.createdAt?.let { parseIsoToMillis(it) }
                     estimatedReadyAtMillis = order.estimatedReadyAt?.let { parseIsoToMillis(it) }
+
                     updateTimeDisplays()
                     startTimerUpdates()
-                } else {
-                    tvOrderStatus.text = "—"
-                    tvCreatedAt.text = "—"
-                    tvTotalIsk.text = "—"
-                    tvEstimatedReadyAt.text = "—"
-                    createdAtMillis = null
-                    estimatedReadyAtMillis = null
                 }
             }
         }.start()
     }
 
     private fun parseIsoToMillis(iso: String): Long? {
-        if (iso.isBlank()) return null
-        val trimmed = iso.trim()
-        val formats = listOf(
-            "yyyy-MM-dd'T'HH:mm:ss.SSSSSSXXX",
-            "yyyy-MM-dd'T'HH:mm:ss.SSSXXX",
-            "yyyy-MM-dd'T'HH:mm:ssXXX",
-            "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",
-            "yyyy-MM-dd'T'HH:mm:ss'Z'",
-            "yyyy-MM-dd HH:mm:ss.SSSSSSXXX",
-            "yyyy-MM-dd HH:mm:ss.SSSXXX",
-            "yyyy-MM-dd HH:mm:ssXXX"
-        )
-        for (pattern in formats) {
-            try {
-                val sdf = SimpleDateFormat(pattern, Locale.US).apply {
-                    timeZone = TimeZone.getTimeZone("UTC")
-                }
-                return sdf.parse(trimmed)?.time
-            } catch (_: Exception) { }
+        return try {
+            val sdf = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US)
+            sdf.timeZone = TimeZone.getTimeZone("UTC")
+            sdf.parse(iso)?.time
+        } catch (e: Exception) {
+            null
         }
-        return null
     }
 
     companion object {
