@@ -1,5 +1,6 @@
 package com.example.whoopsmobile.ui.menu
 
+import android.graphics.Typeface
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -7,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -18,17 +20,17 @@ import com.example.whoopsmobile.data.api.ApiResult
 import com.example.whoopsmobile.model.Item
 import com.example.whoopsmobile.service.BasketService
 import com.example.whoopsmobile.service.SessionManager
-import com.google.android.material.chip.ChipGroup
 
 class MenuFragment : Fragment() {
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: MenuAdapter
     private lateinit var emptyText: TextView
-    private lateinit var filterChipGroup: ChipGroup
     private lateinit var basketBadge: TextView
     private lateinit var tvWaitTimeHeader: TextView
+    private lateinit var filterTabs: List<TextView>
 
+    private var selectedTabId: Int = R.id.chipAll
     private var allItems: List<Item> = emptyList()
 
     override fun onCreateView(
@@ -43,29 +45,51 @@ class MenuFragment : Fragment() {
 
         recyclerView = view.findViewById(R.id.rvItems)
         emptyText = view.findViewById(R.id.tvEmpty)
-        filterChipGroup = view.findViewById(R.id.filterChipGroup)
         basketBadge = view.findViewById(R.id.basketBadge)
         tvWaitTimeHeader = view.findViewById(R.id.tvWaitTimeHeader)
         val btnBasket: ImageButton = view.findViewById(R.id.btnBasket)
 
-        recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        filterTabs = listOf(
+            view.findViewById(R.id.chipAll),
+            view.findViewById(R.id.chipVegetarian),
+            view.findViewById(R.id.chipSides),
+            view.findViewById(R.id.chipDrinks)
+        )
 
+        recyclerView.layoutManager = LinearLayoutManager(requireContext())
         adapter = MenuAdapter(emptyList()) { item -> (activity as? MainActivity)?.openItemDetails(item.id) }
         recyclerView.adapter = adapter
 
         btnBasket.setOnClickListener { (activity as? MainActivity)?.openBasket() }
 
-        filterChipGroup.setOnCheckedStateChangeListener { _, checkedIds ->
-            if (checkedIds.isEmpty()) return@setOnCheckedStateChangeListener
-            applyFilter(checkedIds.first())
+        filterTabs.forEach { tab ->
+            tab.setOnClickListener { selectTab(tab.id) }
         }
 
+        selectTab(R.id.chipAll)
         loadItems()
     }
 
     override fun onResume() {
         super.onResume()
         updateBasketBadge()
+    }
+
+    private fun selectTab(tabId: Int) {
+        selectedTabId = tabId
+        val selectedDrawable = ContextCompat.getDrawable(requireContext(), R.drawable.filter_tab_selected)
+        filterTabs.forEach { tab ->
+            if (tab.id == tabId) {
+                tab.background = selectedDrawable
+                tab.setTypeface(null, Typeface.BOLD)
+                tab.alpha = 1.0f
+            } else {
+                tab.background = null
+                tab.setTypeface(null, Typeface.NORMAL)
+                tab.alpha = 0.5f
+            }
+        }
+        applyFilter(tabId)
     }
 
     private fun updateBasketBadge() {
@@ -85,17 +109,16 @@ class MenuFragment : Fragment() {
         } ?: run { tvWaitTimeHeader.visibility = View.GONE }
     }
 
-    private fun applyFilter(checkedChipId: Int) {
-        val filtered = when (checkedChipId) {
-            R.id.chipVegetarian -> allItems.filter { it.hasTag("vegan") }
-            R.id.chipMeat -> allItems.filter { it.hasTag("meat") }
-            R.id.chipSides -> allItems.filter { it.hasTag("meðlæta") }
+    private fun applyFilter(tabId: Int) {
+        val filtered = when (tabId) {
+            R.id.chipAll -> allItems.filter { it.hasTag("tilboð") }
+            R.id.chipVegetarian -> allItems.filter { it.hasTag("burger") }
+            R.id.chipSides -> allItems.filter { it.hasTag("meðlæti") }
             R.id.chipDrinks -> allItems.filter { it.hasTag("drykkir") }
-            else -> allItems // chipAll or unknown
+            else -> allItems
         }
         adapter.updateItems(filtered)
-        // Show message when filter returns no items (e.g. tags missing in Supabase)
-        if (filtered.isEmpty() && checkedChipId != R.id.chipAll) {
+        if (filtered.isEmpty()) {
             emptyText.text = getString(R.string.no_items_match_filter)
             emptyText.visibility = View.VISIBLE
         } else {
@@ -122,7 +145,7 @@ class MenuFragment : Fragment() {
                         allItems = result.items
                         BasketService.setCurrentMenuItems(result.items)
                         updateWaitTimeHeader()
-                        applyFilter(filterChipGroup.checkedChipId.let { if (it != View.NO_ID) it else R.id.chipAll })
+                        applyFilter(selectedTabId)
                         updateBasketBadge()
                     }
 
@@ -134,7 +157,7 @@ class MenuFragment : Fragment() {
                         allItems = HagaMenuData.items
                         BasketService.setCurrentMenuItems(HagaMenuData.items)
                         updateWaitTimeHeader()
-                        applyFilter(filterChipGroup.checkedChipId.let { if (it != View.NO_ID) it else R.id.chipAll })
+                        applyFilter(selectedTabId)
                         updateBasketBadge()
                     }
 
@@ -145,14 +168,13 @@ class MenuFragment : Fragment() {
                     }
 
                     is ApiResult.Restaurants -> {
-                        // getItems() does not return Restaurants; treat as empty
                         if (SessionManager.restaurantQueueMinutes == null) SessionManager.restaurantQueueMinutes = 20
                         recyclerView.visibility = View.VISIBLE
                         emptyText.visibility = View.GONE
                         allItems = HagaMenuData.items
                         BasketService.setCurrentMenuItems(HagaMenuData.items)
                         updateWaitTimeHeader()
-                        applyFilter(filterChipGroup.checkedChipId.let { if (it != View.NO_ID) it else R.id.chipAll })
+                        applyFilter(selectedTabId)
                         updateBasketBadge()
                     }
                 }
