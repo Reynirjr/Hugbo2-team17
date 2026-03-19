@@ -14,8 +14,6 @@ import com.example.whoopsmobile.ui.checkout.CheckoutFragment
 import com.example.whoopsmobile.ui.itemdetails.ItemDetailsFragment
 import com.example.whoopsmobile.ui.menu.MenuFragment
 import com.example.whoopsmobile.ui.orderstatus.OrderStatusFragment
-import com.example.whoopsmobile.ui.phone.PhoneFragment
-import com.example.whoopsmobile.ui.restaurantlist.RestaurantListFragment
 
 class MainActivity : AppCompatActivity() {
 
@@ -33,16 +31,15 @@ class MainActivity : AppCompatActivity() {
         }
 
         if (savedInstanceState == null) {
-            val startFragment = if (SessionManager.isLoggedIn()) RestaurantListFragment() else PhoneFragment()
             supportFragmentManager.beginTransaction()
-                .replace(R.id.main, startFragment)
+                .replace(R.id.main, MenuFragment())
                 .commit()
         }
     }
 
     fun openRestaurantList() {
         supportFragmentManager.beginTransaction()
-            .replace(R.id.main, RestaurantListFragment())
+            .replace(R.id.main, MenuFragment())
             .commit()
     }
 
@@ -72,12 +69,12 @@ class MainActivity : AppCompatActivity() {
             try {
                 supportFragmentManager.popBackStack(null, androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE)
                 supportFragmentManager.beginTransaction()
-                    .replace(R.id.main, RestaurantListFragment())
+                    .replace(R.id.main, MenuFragment())
                     .commitAllowingStateLoss()
             } catch (e: Exception) {
                 try {
                     supportFragmentManager.beginTransaction()
-                        .replace(R.id.main, RestaurantListFragment())
+                        .replace(R.id.main, MenuFragment())
                         .commitAllowingStateLoss()
                 } catch (_: Exception) { }
             }
