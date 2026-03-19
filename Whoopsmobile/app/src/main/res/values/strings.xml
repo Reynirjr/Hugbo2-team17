@@ -3,10 +3,9 @@
     <string name="menu">Matseðill</string>
     <string name="menu_subtitle">Hvað má bjóða þér í dag?</string>
     <string name="wait_time_minutes">~%d mín</string>
-    <string name="filter_all">Allt</string>
-    <string name="filter_vegetarian">Grænmetis</string>
-    <string name="filter_meat">Kjöt</string>
-    <string name="filter_sides">Meðlæta</string>
+    <string name="filter_all">Tilboð</string>
+    <string name="filter_vegetarian">Börger</string>
+    <string name="filter_sides">Meðlæti</string>
     <string name="filter_drinks">Drykkir</string>
     <string name="no_items_match_filter">Engar vörur passa við þetta síu</string>
     <string name="nothing_on_menu">Ekkert á matseðli</string>
