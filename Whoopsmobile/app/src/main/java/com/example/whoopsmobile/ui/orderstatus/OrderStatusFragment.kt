@@ -31,7 +31,6 @@ class OrderStatusFragment : Fragment() {
     private lateinit var line3: View
     private var orderId: Long = 0L
     private lateinit var tvOrderId: TextView
-    private lateinit var tvOrderStatus: TextView
     private lateinit var tvCreatedAt: TextView
     private lateinit var tvTotalIsk: TextView
     private lateinit var tvEstimatedReadyAt: TextView
@@ -269,7 +268,6 @@ class OrderStatusFragment : Fragment() {
                 progressStatus.visibility = View.GONE
 
                 if (order != null) {
-                    tvOrderStatus.text = order.status
                     updateProgress(order.status)
                     tvTotalIsk.text = order.totalIsk?.let { "$it ISK" } ?: "—"
                     createdAtMillis = order.createdAt?.let { parseIsoToMillis(it) }
