@@ -44,39 +44,48 @@ object BasketService {
             for (i in 0 until arr.length()) {
                 val ob = arr.getJSONObject(i)
                 val item = parseItem(ob.getJSONObject("item"))
-                val addedIngredients = mutableListOf<Ingredient>()
-                val addedArr = ob.optJSONArray("addedIngredients")
-                if (addedArr != null) {
-                    for (k in 0 until addedArr.length()) {
-                        val ig = addedArr.getJSONObject(k)
-                        addedIngredients.add(Ingredient(
-                            id = ig.getInt("id"),
-                            name = ig.optString("name", ""),
-                            category = ig.optString("category", ""),
-                            extraPriceIsk = ig.optInt("extraPriceIsk", 0),
-                            displayOrder = ig.optInt("displayOrder", 0)
-                        ))
-                    }
-                }
-                val removedIds = mutableListOf<Int>()
-                val removedArr = ob.optJSONArray("removedIngredientIds")
-                if (removedArr != null) {
-                    for (k in 0 until removedArr.length()) {
-                        removedIds.add(removedArr.getInt(k))
-                    }
-                }
+                val addedIngredients = parseIngredientArray(ob.optJSONArray("addedIngredients"))
+                val removedIngredients = parseIngredientArray(ob.optJSONArray("removedIngredients"))
                 basket.items.add(
                     BasketItem(
                         id = ob.optString("id", UUID.randomUUID().toString()),
                         item = item,
                         quantity = ob.optInt("quantity", 1).coerceAtLeast(1),
                         addedIngredients = addedIngredients,
-                        removedIngredientIds = removedIds
+                        removedIngredients = removedIngredients
                     )
                 )
             }
         } catch (_: Exception) {
             // Ignore corrupt or old-format data
+        }
+    }
+
+    private fun parseIngredientArray(arr: JSONArray?): List<Ingredient> {
+        if (arr == null) return emptyList()
+        return (0 until arr.length()).map { k ->
+            val ig = arr.getJSONObject(k)
+            Ingredient(
+                id = ig.getInt("id"),
+                name = ig.optString("name", ""),
+                category = ig.optString("category", ""),
+                extraPriceIsk = ig.optInt("extraPriceIsk", 0),
+                displayOrder = ig.optInt("displayOrder", 0)
+            )
+        }
+    }
+
+    private fun ingredientToJsonArray(ingredients: List<Ingredient>): JSONArray {
+        return JSONArray().apply {
+            ingredients.forEach { ig ->
+                put(JSONObject().apply {
+                    put("id", ig.id)
+                    put("name", ig.name)
+                    put("category", ig.category)
+                    put("extraPriceIsk", ig.extraPriceIsk)
+                    put("displayOrder", ig.displayOrder)
+                })
+            }
         }
     }
 
@@ -88,20 +97,8 @@ object BasketService {
                     put("id", bi.id)
                     put("quantity", bi.quantity)
                     put("item", itemToJson(bi.item))
-                    put("addedIngredients", JSONArray().apply {
-                        bi.addedIngredients.forEach { ig ->
-                            put(JSONObject().apply {
-                                put("id", ig.id)
-                                put("name", ig.name)
-                                put("category", ig.category)
-                                put("extraPriceIsk", ig.extraPriceIsk)
-                                put("displayOrder", ig.displayOrder)
-                            })
-                        }
-                    })
-                    put("removedIngredientIds", JSONArray().apply {
-                        bi.removedIngredientIds.forEach { put(it) }
-                    })
+                    put("addedIngredients", ingredientToJsonArray(bi.addedIngredients))
+                    put("removedIngredients", ingredientToJsonArray(bi.removedIngredients))
                 }
             )
         }
@@ -142,14 +139,13 @@ object BasketService {
         item: Item,
         quantity: Int,
         addedIngredients: List<Ingredient> = emptyList(),
-        removedIngredientIds: List<Int> = emptyList()
+        removedIngredients: List<Ingredient> = emptyList()
     ) {
         require(quantity > 0) { "Quantity must be positive" }
-        // Always add as separate line when customizations differ
         val existing = basket.items.find {
             it.item.id == item.id &&
             it.addedIngredients == addedIngredients &&
-            it.removedIngredientIds == removedIngredientIds
+            it.removedIngredients == removedIngredients
         }
         if (existing != null) {
             val idx = basket.items.indexOf(existing)
@@ -161,7 +157,7 @@ object BasketService {
                     item = item,
                     quantity = quantity,
                     addedIngredients = addedIngredients,
-                    removedIngredientIds = removedIngredientIds
+                    removedIngredients = removedIngredients
                 )
             )
         }
