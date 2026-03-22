@@ -19,6 +19,7 @@ import com.example.whoopsmobile.service.OrderService
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
+import kotlin.math.roundToInt
 
 class OrderStatusFragment : Fragment() {
 
@@ -33,9 +34,8 @@ class OrderStatusFragment : Fragment() {
     private lateinit var btnRefreshStatus: Button
     private lateinit var btnBackToRestaurants: Button
 
-    private val restaurantLat = 64.1456
-    private val restaurantLng = -21.9497
-
+    private val restaurantLat = 64.144354
+    private val restaurantLng = -21.961650
     private var createdAtMillis: Long? = null
     private var estimatedReadyAtMillis: Long? = null
 
@@ -163,8 +163,8 @@ class OrderStatusFragment : Fragment() {
                     val meters = (distance * 1000).toInt()
                     "Fjarlægð: $meters m frá veitingastað"
                 } else {
-                    val rounded = String.format("%.1f", distance)
-                    "Fjarlægð: $rounded km frá veitingastað"
+                    val km = distance.roundToInt()
+                    "Fjarlægð: $km km frá veitingastað"
                 }
 
                 tvDistance.text = text
