@@ -15,13 +15,11 @@
         android:orientation="vertical"
         android:elevation="4dp">
 
-        <!-- Top row: logo + wait time -->
-        <LinearLayout
+        <!-- Top row: logo (center) + last order shortcut (top end) -->
+        <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="16dp"
-            android:gravity="center_vertical">
+            android:padding="16dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -44,27 +42,24 @@
                     android:textSize="14sp"
                     android:textColor="#F6F4E4"
                     android:layout_marginTop="4dp"/>
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnOrderQueueStatus"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:minHeight="40dp"
-                    android:paddingStart="16dp"
-                    android:paddingEnd="16dp"
-                    android:text="@string/order_status_title"
-                    android:textAllCaps="false"
-                    android:textColor="#F6F4E4"
-                    android:textSize="13sp"
-                    android:visibility="gone"
-                    app:backgroundTint="@android:color/transparent"
-                    app:cornerRadius="20dp"
-                    app:strokeColor="#F6F4E4"
-                    app:strokeWidth="1dp"/>
             </LinearLayout>
-        </LinearLayout>
+
+            <TextView
+                android:id="@+id/btnLastOrderStatus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top|end"
+                android:padding="8dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:text="@string/order_status_title"
+                android:textColor="#F6F4E4"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                android:visibility="gone"
+                android:focusable="true"
+                android:clickable="true"
+                android:contentDescription="@string/order_status_title"/>
+        </FrameLayout>
 
         <!-- Filter tabs row inside the banner -->
         <LinearLayout
@@ -149,49 +144,59 @@
         android:background="#F6F4E4"
         android:clipToPadding="false"/>
 
-    <LinearLayout
+    <com.google.android.material.card.MaterialCardView
         android:id="@+id/basketBarContainer"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:minHeight="56dp"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:paddingStart="20dp"
-        android:paddingEnd="20dp"
-        android:paddingTop="14dp"
-        android:paddingBottom="14dp"
-        android:background="#291317"
-        android:elevation="10dp"
-        android:visibility="gone"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginStart="20dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="16dp"
         android:clickable="true"
         android:focusable="true"
+        android:visibility="gone"
         android:contentDescription="@string/your_basket"
-        android:foreground="?attr/selectableItemBackground">
+        app:cardBackgroundColor="@color/brand_primary"
+        app:cardCornerRadius="999dp"
+        app:cardElevation="6dp"
+        app:rippleColor="#40FFFFFF"
+        app:strokeWidth="0dp">
 
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/your_basket"
-            android:textColor="#F6F4E4"
-            android:textSize="17sp"
-            android:textStyle="bold"/>
-
-        <TextView
-            android:id="@+id/basketBadge"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
-            android:minWidth="24dp"
-            android:minHeight="24dp"
-            android:background="@drawable/badge_background"
-            android:gravity="center"
-            android:textColor="#291317"
-            android:textSize="13sp"
-            android:textStyle="bold"
-            android:visibility="gone"
-            android:paddingStart="8dp"
-            android:paddingEnd="8dp"/>
-    </LinearLayout>
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingStart="28dp"
+            android:paddingEnd="28dp"
+            android:paddingTop="14dp"
+            android:paddingBottom="14dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/your_basket"
+                android:textColor="@color/cream"
+                android:textSize="17sp"
+                android:textStyle="bold"/>
+
+            <TextView
+                android:id="@+id/basketBadge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:minWidth="26dp"
+                android:minHeight="26dp"
+                android:background="@drawable/badge_background"
+                android:gravity="center"
+                android:textColor="@color/brand_primary"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                android:visibility="gone"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"/>
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
 
 </LinearLayout>

@@ -14,7 +14,6 @@ import com.example.whoopsmobile.ui.checkout.CheckoutFragment
 import com.example.whoopsmobile.ui.itemdetails.ItemDetailsFragment
 import com.example.whoopsmobile.ui.menu.MenuFragment
 import com.example.whoopsmobile.ui.orderstatus.OrderStatusFragment
-import com.example.whoopsmobile.ui.queuestatus.QueueOrderStatusFragment
 
 class MainActivity : AppCompatActivity() {
 
@@ -64,24 +63,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    /** From order status screen: go to restaurant list and clear back stack. */
-    fun openRestaurantListClearBackStack() {
-        Handler(Looper.getMainLooper()).post {
-            try {
-                supportFragmentManager.popBackStack(null, androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE)
-                supportFragmentManager.beginTransaction()
-                    .replace(R.id.main, MenuFragment())
-                    .commitAllowingStateLoss()
-            } catch (e: Exception) {
-                try {
-                    supportFragmentManager.beginTransaction()
-                        .replace(R.id.main, MenuFragment())
-                        .commitAllowingStateLoss()
-                } catch (_: Exception) { }
-            }
-        }
-    }
-
     fun openMenu(menuId: Long) {
         SessionManager.currentMenuId = menuId
         supportFragmentManager.beginTransaction()
@@ -120,9 +101,9 @@ class MainActivity : AppCompatActivity() {
             .commit()
     }
 
-    fun openQueueOrderStatus() {
+    fun openOrderStatus(orderId: Long) {
         supportFragmentManager.beginTransaction()
-            .replace(R.id.main, QueueOrderStatusFragment())
+            .replace(R.id.main, OrderStatusFragment.newInstance(orderId))
             .addToBackStack(null)
             .commit()
     }

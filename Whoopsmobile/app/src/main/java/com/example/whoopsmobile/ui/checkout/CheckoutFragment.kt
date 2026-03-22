@@ -70,6 +70,7 @@ class CheckoutFragment : Fragment() {
                 view?.findViewById<Button>(R.id.btnConfirmOrder)?.isEnabled = true
                 if (order != null) {
                     BasketService.clearBasket()
+                    SessionManager.lastPlacedOrderId = order.id
                     Toast.makeText(act, act.getString(R.string.order_placed), Toast.LENGTH_SHORT).show()
                     (act as? MainActivity)?.openOrderStatusClearBackStack(order.id)
                 } else {
