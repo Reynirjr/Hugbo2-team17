@@ -31,7 +31,6 @@ class OrderStatusFragment : Fragment() {
     private lateinit var line3: View
     private var orderId: Long = 0L
     private lateinit var tvOrderId: TextView
-    private lateinit var tvOrderStatus: TextView
     private lateinit var tvCreatedAt: TextView
     private lateinit var tvTotalIsk: TextView
     private lateinit var tvEstimatedReadyAt: TextView
@@ -95,16 +94,6 @@ class OrderStatusFragment : Fragment() {
 
         loadOrderStatus()
         checkLocationPermissionAndUpdate()
-    }
-
-    private fun getStatusTextIcelandic(status: String?): String {
-        return when (status?.lowercase()) {
-            "received" -> getString(R.string.status_received)
-            "preparing" -> getString(R.string.status_preparing)
-            "ready" -> getString(R.string.status_ready)
-            "completed" -> getString(R.string.status_completed)
-            else -> status ?: "Óþekkt"
-        }
     }
 
     private fun updateProgress(status: String?) {
