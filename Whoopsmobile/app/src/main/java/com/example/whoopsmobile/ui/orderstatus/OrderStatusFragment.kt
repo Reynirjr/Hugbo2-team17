@@ -13,7 +13,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.fragment.app.Fragment
-import com.example.whoopsmobile.MainActivity
 import com.example.whoopsmobile.R
 import com.example.whoopsmobile.service.OrderService
 import java.text.SimpleDateFormat
@@ -36,7 +35,6 @@ class OrderStatusFragment : Fragment() {
     private lateinit var tvDistance: TextView
     private lateinit var progressStatus: ProgressBar
     private lateinit var btnRefreshStatus: Button
-    private lateinit var btnBackToRestaurants: Button
 
     private val restaurantLat = 64.144354
     private val restaurantLng = -21.961650
@@ -78,7 +76,6 @@ class OrderStatusFragment : Fragment() {
         tvDistance = view.findViewById(R.id.tvDistance)
         progressStatus = view.findViewById(R.id.progressStatus)
         btnRefreshStatus = view.findViewById(R.id.btnRefreshStatus)
-        btnBackToRestaurants = view.findViewById(R.id.btnBackToRestaurants)
 
         tvOrderId.text = orderId.toString()
 
@@ -87,10 +84,6 @@ class OrderStatusFragment : Fragment() {
         }
 
         btnRefreshStatus.setOnClickListener { loadOrderStatus() }
-
-        btnBackToRestaurants.setOnClickListener {
-            (activity as? MainActivity)?.openRestaurantListClearBackStack()
-        }
 
         loadOrderStatus()
         checkLocationPermissionAndUpdate()
