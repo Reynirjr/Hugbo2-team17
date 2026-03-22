@@ -52,6 +52,7 @@
     <string name="order_ready_in_minutes">Eftir %d mínútur</string>
     <string name="order_ready_now">Nú klárt</string>
     <string name="order_ready_overdue">Áætlað klárt (tíminn er liðinn)</string>
+<<<<<<< Updated upstream
 
     <string name="status_received">Móttekið</string>
     <string name="status_preparing">Í undirbúningi</string>
@@ -61,4 +62,17 @@
     <string name="queue_wait_unknown">Óþekkt</string>
     <string name="timeline_step_queue_detail_with_wait">Áætlaður biðtími í röð er %s</string>
     <string name="timeline_step_queue_detail_no_estimate">Engin biðtímaáætlun í boði</string>
+=======
+    <string name="queue_estimated_wait_heading">Áætlaður biðtími</string>
+    <string name="queue_status_intro">Þetta er áætlun byggð á núverandi álagi veitingastaðsins. Framvindan hér sýnir hvernig pöntunin þín fer eftir að hún er send.</string>
+    <string name="queue_timeline_heading">Framvinda</string>
+    <string name="timeline_step_queue_title">Biðröð</string>
+    <string name="timeline_step_queue_detail_with_wait">Núverandi álag á eldhúsi · %1$s</string>
+    <string name="timeline_step_queue_detail_no_estimate">Núverandi álag á eldhúsi — engin biðtími í boði eins og er</string>
+    <string name="timeline_step_received_title">Pöntun móttekin</string>
+    <string name="timeline_step_preparing_title">Undirbúningur</string>
+    <string name="timeline_step_ready_title">Tilbúið til að sækja</string>
+    <string name="timeline_step_pending_hint">Eftir að pöntun er send</string>
+    <string name="queue_wait_unknown">Engin áætlun</string>
+>>>>>>> Stashed changes
 </resources>
