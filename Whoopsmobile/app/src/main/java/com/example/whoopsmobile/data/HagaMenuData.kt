@@ -12,20 +12,24 @@ object HagaMenuData {
     val ingredients: List<Ingredient> = listOf(
         Ingredient(1, "Auka kjöt", "extra", 590, 1),
         Ingredient(2, "Auka ostur", "extra", 100, 2),
-        Ingredient(3, "Ostur", "ostur", 0, 3),
-        Ingredient(4, "Vegan ostur", "ostur", 0, 4),
-        Ingredient(5, "Mæjó", "sosur", 0, 5),
-        Ingredient(6, "Sinnep", "sosur", 0, 6),
-        Ingredient(7, "Tómatsósa", "sosur", 0, 7),
-        Ingredient(8, "Siracha", "sosur", 0, 8),
-        Ingredient(9, "Vegan mæjó", "sosur", 0, 9),
-        Ingredient(10, "Relish", "sosur", 0, 10),
-        Ingredient(11, "Karmellíseraður laukur", "alegg", 0, 11),
-        Ingredient(12, "Pikklaður laukur", "alegg", 0, 12),
-        Ingredient(13, "Pikklaðar gúrkur", "alegg", 0, 13),
-        Ingredient(14, "Kál", "alegg", 0, 14),
-        Ingredient(15, "Tómatur", "alegg", 0, 15),
-        Ingredient(16, "Rauður laukur", "alegg", 0, 16)
+        Ingredient(17, "Auka vegan ostur", "extra", 100, 3),
+        Ingredient(3, "Ostur", "ostur", 0, 4),
+        Ingredient(4, "Vegan ostur", "ostur", 0, 5),
+        Ingredient(5, "Mæjó", "sosur", 0, 6),
+        Ingredient(18, "Lítið mæjó", "sosur", 0, 7),
+        Ingredient(6, "Sinnep", "sosur", 0, 8),
+        Ingredient(19, "Lítið sinnep", "sosur", 0, 9),
+        Ingredient(7, "Tómatsósa", "sosur", 0, 10),
+        Ingredient(20, "Lítil tómatsósa", "sosur", 0, 11),
+        Ingredient(8, "Siracha", "sosur", 0, 12),
+        Ingredient(9, "Vegan mæjó", "sosur", 0, 13),
+        Ingredient(10, "Relish", "sosur", 0, 14),
+        Ingredient(11, "Karmellíseraður laukur", "alegg", 0, 15),
+        Ingredient(12, "Pikklaður laukur", "alegg", 0, 16),
+        Ingredient(13, "Pikklaðar gúrkur", "alegg", 0, 17),
+        Ingredient(14, "Kál", "alegg", 0, 18),
+        Ingredient(15, "Tómatur", "alegg", 0, 19),
+        Ingredient(16, "Rauður laukur", "alegg", 0, 20)
     )
 
     /** Default ingredient IDs per item (matching fallback item IDs) */
