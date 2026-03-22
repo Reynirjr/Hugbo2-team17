@@ -96,16 +96,6 @@ class OrderStatusFragment : Fragment() {
         checkLocationPermissionAndUpdate()
     }
 
-    private fun getStatusTextIcelandic(status: String?): String {
-        return when (status?.lowercase()) {
-            "received" -> getString(R.string.status_received)
-            "preparing" -> getString(R.string.status_preparing)
-            "ready" -> getString(R.string.status_ready)
-            "completed" -> getString(R.string.status_completed)
-            else -> status ?: "Óþekkt"
-        }
-    }
-
     private fun updateProgress(status: String?) {
         val currentStep = when (status?.lowercase()) {
             "received" -> 1
