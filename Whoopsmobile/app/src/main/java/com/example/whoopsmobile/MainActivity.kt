@@ -14,6 +14,7 @@ import com.example.whoopsmobile.ui.checkout.CheckoutFragment
 import com.example.whoopsmobile.ui.itemdetails.ItemDetailsFragment
 import com.example.whoopsmobile.ui.menu.MenuFragment
 import com.example.whoopsmobile.ui.orderstatus.OrderStatusFragment
+import com.example.whoopsmobile.ui.queuestatus.QueueOrderStatusFragment
 
 class MainActivity : AppCompatActivity() {
 
@@ -115,6 +116,13 @@ class MainActivity : AppCompatActivity() {
     fun openCheckout() {
         supportFragmentManager.beginTransaction()
             .replace(R.id.main, CheckoutFragment())
+            .addToBackStack(null)
+            .commit()
+    }
+
+    fun openQueueOrderStatus() {
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.main, QueueOrderStatusFragment())
             .addToBackStack(null)
             .commit()
     }
