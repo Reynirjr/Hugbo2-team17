@@ -1,16 +1,22 @@
 package com.example.whoopsmobile.ui.itemdetails
 
+import android.graphics.Typeface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.CheckBox
 import android.widget.ImageButton
+import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.example.whoopsmobile.MainActivity
 import com.example.whoopsmobile.R
+import com.example.whoopsmobile.data.HagaMenuData
+import com.example.whoopsmobile.data.api.ApiHelper
+import com.example.whoopsmobile.model.Ingredient
 import com.example.whoopsmobile.service.BasketService
 
 class ItemDetailsFragment : Fragment() {
@@ -25,6 +31,13 @@ class ItemDetailsFragment : Fragment() {
     private lateinit var btnDecrease: ImageButton
     private lateinit var btnIncrease: ImageButton
     private lateinit var btnAddToBasket: Button
+    private lateinit var btnBreyta: Button
+    private lateinit var ingredientsPanel: LinearLayout
+
+    private var allIngredients: List<Ingredient> = emptyList()
+    private var defaultIngredientIds: List<Int> = emptyList()
+    private val checkedIngredientIds = mutableSetOf<Int>()
+    private var ingredientsLoaded = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -42,6 +55,9 @@ class ItemDetailsFragment : Fragment() {
         btnDecrease = view.findViewById(R.id.btnDecrease)
         btnIncrease = view.findViewById(R.id.btnIncrease)
         btnAddToBasket = view.findViewById(R.id.btnAddToBasket)
+        btnBreyta = view.findViewById(R.id.btnBreyta)
+        ingredientsPanel = view.findViewById(R.id.ingredientsPanel)
+
         view.findViewById<ImageButton>(R.id.btnBack).setOnClickListener {
             activity?.onBackPressedDispatcher?.onBackPressed()
         }
@@ -70,11 +86,128 @@ class ItemDetailsFragment : Fragment() {
             quantity++
             tvQuantity.text = quantity.toString()
         }
+
+        btnBreyta.setOnClickListener {
+            if (ingredientsPanel.visibility == View.GONE) {
+                if (!ingredientsLoaded) {
+                    loadIngredients()
+                }
+                ingredientsPanel.visibility = View.VISIBLE
+                btnBreyta.text = getString(R.string.breyta) + " ▲"
+            } else {
+                ingredientsPanel.visibility = View.GONE
+                btnBreyta.text = getString(R.string.breyta) + " ▼"
+            }
+        }
+        btnBreyta.text = getString(R.string.breyta) + " ▼"
+
         btnAddToBasket.setOnClickListener {
-            BasketService.addItem(item, quantity)
+            val addedIngredients = if (ingredientsLoaded) {
+                // Extras that were checked (not in defaults, or extras category always counted)
+                allIngredients.filter { ig ->
+                    ig.id in checkedIngredientIds &&
+                    ig.extraPriceIsk > 0 &&
+                    ig.id !in defaultIngredientIds
+                }
+            } else emptyList()
+
+            val removedIds = if (ingredientsLoaded) {
+                // Default ingredients that were unchecked
+                defaultIngredientIds.filter { it !in checkedIngredientIds }
+            } else emptyList()
+
+            BasketService.addItem(item, quantity, addedIngredients, removedIds)
             Toast.makeText(requireContext(), getString(R.string.add_to_basket), Toast.LENGTH_SHORT).show()
             (activity as? MainActivity)?.openBasketFromItemDetails()
         }
+    }
+
+    private fun loadIngredients() {
+        ingredientsLoaded = true
+        Thread {
+            val api = ApiHelper()
+            var ingredients = api.getIngredients()
+            var defaultIds = api.getItemIngredientIds(itemId)
+
+            // Fallback to local data
+            if (ingredients.isEmpty()) {
+                ingredients = HagaMenuData.ingredients
+            }
+            if (defaultIds.isEmpty()) {
+                defaultIds = HagaMenuData.itemIngredientDefaults[itemId] ?: emptyList()
+            }
+
+            allIngredients = ingredients
+            defaultIngredientIds = defaultIds
+            checkedIngredientIds.clear()
+            checkedIngredientIds.addAll(defaultIds)
+
+            activity?.runOnUiThread {
+                buildIngredientsUI()
+            }
+        }.start()
+    }
+
+    private fun buildIngredientsUI() {
+        ingredientsPanel.removeAllViews()
+
+        val categoryOrder = listOf("extra", "ostur", "sosur", "alegg")
+        val categoryNames = mapOf(
+            "extra" to getString(R.string.category_extra),
+            "ostur" to getString(R.string.category_ostur),
+            "sosur" to getString(R.string.category_sosur),
+            "alegg" to getString(R.string.category_alegg)
+        )
+
+        for (cat in categoryOrder) {
+            val catIngredients = allIngredients.filter { it.category == cat }
+            if (catIngredients.isEmpty()) continue
+
+            // Category header
+            val header = TextView(requireContext()).apply {
+                text = categoryNames[cat] ?: cat
+                textSize = 16f
+                setTypeface(null, Typeface.BOLD)
+                setTextColor(0xFF291317.toInt())
+                setPadding(0, 16, 0, 8)
+            }
+            ingredientsPanel.addView(header)
+
+            // Checkboxes for each ingredient
+            for (ig in catIngredients) {
+                val label = if (ig.extraPriceIsk > 0) {
+                    "${ig.name} +${ig.extraPriceIsk} kr"
+                } else {
+                    ig.name
+                }
+
+                val cb = CheckBox(requireContext()).apply {
+                    text = label
+                    isChecked = ig.id in checkedIngredientIds
+                    textSize = 15f
+                    setTextColor(0xFF291317.toInt())
+                    setPadding(8, 4, 0, 4)
+                    setOnCheckedChangeListener { _, checked ->
+                        if (checked) {
+                            checkedIngredientIds.add(ig.id)
+                        } else {
+                            checkedIngredientIds.remove(ig.id)
+                        }
+                        updatePriceDisplay()
+                    }
+                }
+                ingredientsPanel.addView(cb)
+            }
+        }
+    }
+
+    private fun updatePriceDisplay() {
+        val item = BasketService.getItemById(itemId) ?: return
+        val extrasPrice = allIngredients
+            .filter { it.id in checkedIngredientIds && it.extraPriceIsk > 0 && it.id !in defaultIngredientIds }
+            .sumOf { it.extraPriceIsk }
+        val totalPrice = item.priceIsk + extrasPrice
+        tvItemPrice.text = "$totalPrice ISK"
     }
 
     companion object {
