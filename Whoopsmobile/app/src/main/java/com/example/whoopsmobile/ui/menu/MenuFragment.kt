@@ -111,9 +111,9 @@ class MenuFragment : Fragment() {
 
     private fun applyFilter(tabId: Int) {
         val filtered = when (tabId) {
-            R.id.chipAll -> allItems.filter { it.hasTag("tilboð") }
+            R.id.chipAll -> allItems.filter { it.hasTag("tilbod") }
             R.id.chipVegetarian -> allItems.filter { it.hasTag("burger") }
-            R.id.chipSides -> allItems.filter { it.hasTag("meðlæti") }
+            R.id.chipSides -> allItems.filter { it.hasTag("sides") }
             R.id.chipDrinks -> allItems.filter { it.hasTag("drykkir") }
             else -> allItems
         }

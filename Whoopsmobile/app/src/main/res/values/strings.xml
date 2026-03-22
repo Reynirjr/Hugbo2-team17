@@ -47,4 +47,9 @@
     <string name="order_ready_in_minutes">Eftir %d mínútur</string>
     <string name="order_ready_now">Nú klárt</string>
     <string name="order_ready_overdue">Áætlað klárt (tíminn er liðinn)</string>
+
+    <string name="status_received">Móttekið</string>
+    <string name="status_preparing">Í undirbúningi</string>
+    <string name="status_ready">Tilbúið</string>
+    <string name="status_completed">Lokið</string>
 </resources>
