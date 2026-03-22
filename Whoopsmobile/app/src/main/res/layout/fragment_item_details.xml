@@ -49,86 +49,112 @@
 
             <TextView
                 android:id="@+id/tvItemName"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:textSize="24sp"
-            android:textStyle="bold"
-            android:textColor="#291317"/>
-
-        <TextView
-            android:id="@+id/tvItemDescription"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:textSize="16sp"
-            android:textColor="#555555"/>
-
-        <TextView
-            android:id="@+id/tvItemPrice"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:textColor="#291317"/>
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:text="@string/quantity"
-            android:textSize="14sp"
-            android:textStyle="bold"
-            android:textColor="#291317"/>
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
-
-            <ImageButton
-                android:id="@+id/btnDecrease"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:src="@drawable/ic_remove"
-                android:contentDescription="@string/quantity"
-                android:scaleType="centerInside"
-                android:padding="8dp"/>
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="24sp"
+                android:textStyle="bold"
+                android:textColor="#291317"/>
 
             <TextView
-                android:id="@+id/tvQuantity"
-                android:layout_width="60dp"
+                android:id="@+id/tvItemDescription"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center"
+                android:layout_marginTop="8dp"
+                android:textSize="16sp"
+                android:textColor="#555555"/>
+
+            <TextView
+                android:id="@+id/tvItemPrice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
                 android:textSize="20sp"
                 android:textStyle="bold"
-                android:text="1"
-                android:minHeight="48dp"
-                android:minWidth="60dp"/>
+                android:textColor="#291317"/>
 
-            <ImageButton
-                android:id="@+id/btnIncrease"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:background="?attr/selectableItemBackgroundBorderless"
-                android:src="@android:drawable/ic_input_add"
-                android:contentDescription="@string/quantity"
-                android:scaleType="centerInside"
-                android:padding="8dp"/>
-        </LinearLayout>
+            <!-- Breyta (customize) button -->
+            <Button
+                android:id="@+id/btnBreyta"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="@string/breyta"
+                android:textSize="14sp"
+                android:padding="12dp"
+                android:backgroundTint="#291317"
+                android:textColor="#F6F4E4"/>
 
-        <Button
-            android:id="@+id/btnAddToBasket"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:text="@string/add_to_basket"
-            android:textSize="16sp"
-            android:padding="16dp"/>
+            <!-- Ingredients panel (hidden by default) -->
+            <LinearLayout
+                android:id="@+id/ingredientsPanel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginTop="8dp"
+                android:visibility="gone"
+                android:background="#EEECE0"
+                android:padding="16dp">
+
+                <!-- Ingredients will be added programmatically -->
+
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:text="@string/quantity"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:textColor="#291317"/>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <ImageButton
+                    android:id="@+id/btnDecrease"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:src="@drawable/ic_remove"
+                    android:contentDescription="@string/quantity"
+                    android:scaleType="centerInside"
+                    android:padding="8dp"/>
+
+                <TextView
+                    android:id="@+id/tvQuantity"
+                    android:layout_width="60dp"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:text="1"
+                    android:minHeight="48dp"
+                    android:minWidth="60dp"/>
+
+                <ImageButton
+                    android:id="@+id/btnIncrease"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:src="@android:drawable/ic_input_add"
+                    android:contentDescription="@string/quantity"
+                    android:scaleType="centerInside"
+                    android:padding="8dp"/>
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/btnAddToBasket"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:text="@string/add_to_basket"
+                android:textSize="16sp"
+                android:padding="16dp"/>
         </LinearLayout>
     </ScrollView>
 </LinearLayout>
-
