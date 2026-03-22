@@ -63,24 +63,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    /** From order status screen: go to restaurant list and clear back stack. */
-    fun openRestaurantListClearBackStack() {
-        Handler(Looper.getMainLooper()).post {
-            try {
-                supportFragmentManager.popBackStack(null, androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE)
-                supportFragmentManager.beginTransaction()
-                    .replace(R.id.main, MenuFragment())
-                    .commitAllowingStateLoss()
-            } catch (e: Exception) {
-                try {
-                    supportFragmentManager.beginTransaction()
-                        .replace(R.id.main, MenuFragment())
-                        .commitAllowingStateLoss()
-                } catch (_: Exception) { }
-            }
-        }
-    }
-
     fun openMenu(menuId: Long) {
         SessionManager.currentMenuId = menuId
         supportFragmentManager.beginTransaction()
@@ -115,6 +97,13 @@ class MainActivity : AppCompatActivity() {
     fun openCheckout() {
         supportFragmentManager.beginTransaction()
             .replace(R.id.main, CheckoutFragment())
+            .addToBackStack(null)
+            .commit()
+    }
+
+    fun openOrderStatus(orderId: Long) {
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.main, OrderStatusFragment.newInstance(orderId))
             .addToBackStack(null)
             .commit()
     }

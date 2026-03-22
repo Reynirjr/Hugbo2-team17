@@ -13,6 +13,7 @@ object SessionManager {
     private const val KEY_PHONE = "customer_phone"
     private const val KEY_MENU_ID = "current_menu_id"
     private const val KEY_QUEUE_MINUTES = "restaurant_queue_minutes"
+    private const val KEY_LAST_PLACED_ORDER_ID = "last_placed_order_id"
 
     private var prefs: SharedPreferences? = null
 
@@ -34,6 +35,11 @@ object SessionManager {
     var restaurantQueueMinutes: Int?
         get() = requirePrefs().getInt(KEY_QUEUE_MINUTES, -1).takeIf { it >= 0 }
         set(value) = requirePrefs().edit().putInt(KEY_QUEUE_MINUTES, value ?: -1).apply()
+
+    /** Set when checkout succeeds; used for menu shortcut back to order status. Cleared with [clear]. */
+    var lastPlacedOrderId: Long?
+        get() = requirePrefs().getLong(KEY_LAST_PLACED_ORDER_ID, -1L).takeIf { it > 0L }
+        set(value) = requirePrefs().edit().putLong(KEY_LAST_PLACED_ORDER_ID, value ?: -1L).apply()
 
     fun isLoggedIn(): Boolean = !customerPhone.isNullOrBlank()
 

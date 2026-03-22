@@ -12,8 +12,8 @@
     <string name="basket">Körfu</string>
     <string name="add_to_basket">Bæta við körfu</string>
     <string name="quantity">Magn</string>
-    <string name="your_basket">Karfan þín</string>
-    <string name="basket_empty">Karfan þín er tóm</string>
+    <string name="your_basket">Karfan Mín</string>
+    <string name="basket_empty">Karfan mín er tóm</string>
     <string name="total">Heild</string>
     <string name="proceed_to_checkout">Halda áfram til greiðslu</string>
     <string name="remove">Fjarlægja</string>
@@ -40,7 +40,6 @@
     <string name="order_id_label">Pöntunarnúmer</string>
     <string name="order_status_label">Staða</string>
     <string name="refresh_status">Uppfæra stöðu</string>
-    <string name="back_to_restaurants">Aftur á veitingahús</string>
     <string name="order_status_loading">Hleð…</string>
     <string name="order_created_at_label">Skráð</string>
     <string name="order_total_label">Heild (ISK)</string>
@@ -52,9 +51,19 @@
     <string name="order_ready_in_minutes">Eftir %d mínútur</string>
     <string name="order_ready_now">Nú klárt</string>
     <string name="order_ready_overdue">Áætlað klárt (tíminn er liðinn)</string>
-
     <string name="status_received">Móttekið</string>
     <string name="status_preparing">Í undirbúningi</string>
     <string name="status_ready">Tilbúið</string>
     <string name="status_completed">Lokið</string>
+    <string name="queue_estimated_wait_heading">Áætlaður biðtími</string>
+    <string name="queue_status_intro">Þetta er áætlun byggð á núverandi álagi veitingastaðsins. Framvindan hér sýnir hvernig pöntunin þín fer eftir að hún er send.</string>
+    <string name="queue_timeline_heading">Framvinda</string>
+    <string name="timeline_step_queue_title">Biðröð</string>
+    <string name="timeline_step_queue_detail_with_wait">Núverandi álag á eldhúsi · %1$s</string>
+    <string name="timeline_step_queue_detail_no_estimate">Núverandi álag á eldhúsi — engin biðtími í boði eins og er</string>
+    <string name="timeline_step_received_title">Pöntun móttekin</string>
+    <string name="timeline_step_preparing_title">Undirbúningur</string>
+    <string name="timeline_step_ready_title">Tilbúið til að sækja</string>
+    <string name="timeline_step_pending_hint">Eftir að pöntun er send</string>
+    <string name="queue_wait_unknown">Engin áætlun</string>
 </resources>
