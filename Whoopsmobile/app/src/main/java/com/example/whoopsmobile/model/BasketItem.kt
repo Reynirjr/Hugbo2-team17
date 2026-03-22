@@ -5,7 +5,7 @@ data class BasketItem(
     val item: Item,
     val quantity: Int,
     val addedIngredients: List<Ingredient> = emptyList(),
-    val removedIngredientIds: List<Int> = emptyList()
+    val removedIngredients: List<Ingredient> = emptyList()
 ) {
     val extrasTotal: Int get() = addedIngredients.sumOf { it.extraPriceIsk }
     val lineTotal: Int get() = (item.priceIsk + extrasTotal) * quantity
