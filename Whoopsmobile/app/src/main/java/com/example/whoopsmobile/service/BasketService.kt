@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import com.example.whoopsmobile.model.Basket
 import com.example.whoopsmobile.model.BasketItem
+import com.example.whoopsmobile.model.Ingredient
 import com.example.whoopsmobile.model.Item
 import org.json.JSONArray
 import org.json.JSONObject
@@ -43,11 +44,34 @@ object BasketService {
             for (i in 0 until arr.length()) {
                 val ob = arr.getJSONObject(i)
                 val item = parseItem(ob.getJSONObject("item"))
+                val addedIngredients = mutableListOf<Ingredient>()
+                val addedArr = ob.optJSONArray("addedIngredients")
+                if (addedArr != null) {
+                    for (k in 0 until addedArr.length()) {
+                        val ig = addedArr.getJSONObject(k)
+                        addedIngredients.add(Ingredient(
+                            id = ig.getInt("id"),
+                            name = ig.optString("name", ""),
+                            category = ig.optString("category", ""),
+                            extraPriceIsk = ig.optInt("extraPriceIsk", 0),
+                            displayOrder = ig.optInt("displayOrder", 0)
+                        ))
+                    }
+                }
+                val removedIds = mutableListOf<Int>()
+                val removedArr = ob.optJSONArray("removedIngredientIds")
+                if (removedArr != null) {
+                    for (k in 0 until removedArr.length()) {
+                        removedIds.add(removedArr.getInt(k))
+                    }
+                }
                 basket.items.add(
                     BasketItem(
                         id = ob.optString("id", UUID.randomUUID().toString()),
                         item = item,
-                        quantity = ob.optInt("quantity", 1).coerceAtLeast(1)
+                        quantity = ob.optInt("quantity", 1).coerceAtLeast(1),
+                        addedIngredients = addedIngredients,
+                        removedIngredientIds = removedIds
                     )
                 )
             }
@@ -64,6 +88,20 @@ object BasketService {
                     put("id", bi.id)
                     put("quantity", bi.quantity)
                     put("item", itemToJson(bi.item))
+                    put("addedIngredients", JSONArray().apply {
+                        bi.addedIngredients.forEach { ig ->
+                            put(JSONObject().apply {
+                                put("id", ig.id)
+                                put("name", ig.name)
+                                put("category", ig.category)
+                                put("extraPriceIsk", ig.extraPriceIsk)
+                                put("displayOrder", ig.displayOrder)
+                            })
+                        }
+                    })
+                    put("removedIngredientIds", JSONArray().apply {
+                        bi.removedIngredientIds.forEach { put(it) }
+                    })
                 }
             )
         }
@@ -100,15 +138,31 @@ object BasketService {
 
     fun getBasket(): Basket = basket
 
-    fun addItem(item: Item, quantity: Int) {
+    fun addItem(
+        item: Item,
+        quantity: Int,
+        addedIngredients: List<Ingredient> = emptyList(),
+        removedIngredientIds: List<Int> = emptyList()
+    ) {
         require(quantity > 0) { "Quantity must be positive" }
-        val existing = basket.items.find { it.item.id == item.id }
+        // Always add as separate line when customizations differ
+        val existing = basket.items.find {
+            it.item.id == item.id &&
+            it.addedIngredients == addedIngredients &&
+            it.removedIngredientIds == removedIngredientIds
+        }
         if (existing != null) {
             val idx = basket.items.indexOf(existing)
             basket.items[idx] = existing.copy(quantity = existing.quantity + quantity)
         } else {
             basket.items.add(
-                BasketItem(id = UUID.randomUUID().toString(), item = item, quantity = quantity)
+                BasketItem(
+                    id = UUID.randomUUID().toString(),
+                    item = item,
+                    quantity = quantity,
+                    addedIngredients = addedIngredients,
+                    removedIngredientIds = removedIngredientIds
+                )
             )
         }
         saveBasket()
