@@ -1,5 +1,6 @@
 package com.example.whoopsmobile.data
 
+import com.example.whoopsmobile.model.Ingredient
 import com.example.whoopsmobile.model.Item
 
 /**
@@ -7,6 +8,39 @@ import com.example.whoopsmobile.model.Item
  * Used when the API returns no items so US1 (view menu) still works.
  */
 object HagaMenuData {
+
+    val ingredients: List<Ingredient> = listOf(
+        Ingredient(1, "Auka kjöt", "extra", 590, 1),
+        Ingredient(2, "Auka ostur", "extra", 100, 2),
+        Ingredient(3, "Ostur", "ostur", 0, 3),
+        Ingredient(4, "Vegan ostur", "ostur", 0, 4),
+        Ingredient(5, "Mæjó", "sosur", 0, 5),
+        Ingredient(6, "Sinnep", "sosur", 0, 6),
+        Ingredient(7, "Tómatsósa", "sosur", 0, 7),
+        Ingredient(8, "Siracha", "sosur", 0, 8),
+        Ingredient(9, "Vegan mæjó", "sosur", 0, 9),
+        Ingredient(10, "Relish", "sosur", 0, 10),
+        Ingredient(11, "Karmellíseraður laukur", "alegg", 0, 11),
+        Ingredient(12, "Pikklaður laukur", "alegg", 0, 12),
+        Ingredient(13, "Pikklaðar gúrkur", "alegg", 0, 13),
+        Ingredient(14, "Kál", "alegg", 0, 14),
+        Ingredient(15, "Tómatur", "alegg", 0, 15),
+        Ingredient(16, "Rauður laukur", "alegg", 0, 16)
+    )
+
+    /** Default ingredient IDs per item (matching fallback item IDs) */
+    val itemIngredientDefaults: Map<Int, List<Int>> = mapOf(
+        5 to listOf(3, 12, 13, 5, 6),   // Hagabörger einfaldur
+        6 to listOf(3, 12, 13, 5, 6),   // Hagabörger tvöfaldur
+        7 to listOf(3, 10, 11, 5, 6),   // Laukbörger einfaldur
+        8 to listOf(3, 10, 11, 5, 6),   // Laukbörger tvöfaldur
+        9 to listOf(3, 16, 14, 15, 5, 6, 7),  // Ostabörger einfaldur
+        10 to listOf(3, 16, 14, 15, 5, 6, 7), // Ostabörger tvöfaldur
+        11 to listOf(3, 7),              // Barnabörger
+        12 to listOf(8, 9),             // Spæsí vegan vængir
+        15 to listOf(9, 8),             // Spæsí franskar
+        16 to listOf(3)                 // Ostafranskar
+    )
 
     val items: List<Item> = listOf(
         // —— Máltíðir (Combo meals) ——

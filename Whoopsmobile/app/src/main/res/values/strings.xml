@@ -19,6 +19,11 @@
     <string name="remove">Fjarlægja</string>
     <string name="back">Til baka</string>
     <string name="item_not_found">Vara fannst ekki</string>
+    <string name="breyta">Breyta</string>
+    <string name="category_extra">Aukaálegg</string>
+    <string name="category_ostur">Ostur</string>
+    <string name="category_sosur">Sósur</string>
+    <string name="category_alegg">Álegg</string>
     <string name="enter_phone_title">Sláðu inn símanúmer</string>
     <string name="enter_phone_subtitle">Til að tengja pantanir þínar</string>
     <string name="phone_hint">Símanúmer</string>
