@@ -6,8 +6,8 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ImageButton
 import android.widget.TextView
+import com.google.android.material.button.MaterialButton
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -26,8 +26,9 @@ class MenuFragment : Fragment() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: MenuAdapter
     private lateinit var emptyText: TextView
+    private lateinit var basketBarContainer: View
     private lateinit var basketBadge: TextView
-    private lateinit var tvWaitTimeHeader: TextView
+    private lateinit var btnOrderQueueStatus: MaterialButton
     private lateinit var filterTabs: List<TextView>
 
     private var selectedTabId: Int = R.id.chipAll
@@ -45,9 +46,9 @@ class MenuFragment : Fragment() {
 
         recyclerView = view.findViewById(R.id.rvItems)
         emptyText = view.findViewById(R.id.tvEmpty)
+        basketBarContainer = view.findViewById(R.id.basketBarContainer)
         basketBadge = view.findViewById(R.id.basketBadge)
-        tvWaitTimeHeader = view.findViewById(R.id.tvWaitTimeHeader)
-        val btnBasket: ImageButton = view.findViewById(R.id.btnBasket)
+        btnOrderQueueStatus = view.findViewById(R.id.btnOrderQueueStatus)
 
         filterTabs = listOf(
             view.findViewById(R.id.chipAll),
@@ -60,7 +61,8 @@ class MenuFragment : Fragment() {
         adapter = MenuAdapter(emptyList()) { item -> (activity as? MainActivity)?.openItemDetails(item.id) }
         recyclerView.adapter = adapter
 
-        btnBasket.setOnClickListener { (activity as? MainActivity)?.openBasket() }
+        basketBarContainer.setOnClickListener { (activity as? MainActivity)?.openBasket() }
+        btnOrderQueueStatus.setOnClickListener { (activity as? MainActivity)?.openQueueOrderStatus() }
 
         filterTabs.forEach { tab ->
             tab.setOnClickListener { selectTab(tab.id) }
@@ -95,18 +97,19 @@ class MenuFragment : Fragment() {
     private fun updateBasketBadge() {
         val count = BasketService.totalItemCount()
         if (count > 0) {
+            basketBarContainer.visibility = View.VISIBLE
             basketBadge.visibility = View.VISIBLE
             basketBadge.text = if (count > 99) "99+" else count.toString()
         } else {
+            basketBarContainer.visibility = View.GONE
             basketBadge.visibility = View.GONE
         }
     }
 
     private fun updateWaitTimeHeader() {
-        SessionManager.restaurantQueueMinutes?.takeIf { it > 0 }?.let { min ->
-            tvWaitTimeHeader.visibility = View.VISIBLE
-            tvWaitTimeHeader.text = getString(R.string.wait_time_minutes, min)
-        } ?: run { tvWaitTimeHeader.visibility = View.GONE }
+        SessionManager.restaurantQueueMinutes?.takeIf { it > 0 }?.let {
+            btnOrderQueueStatus.visibility = View.VISIBLE
+        } ?: run { btnOrderQueueStatus.visibility = View.GONE }
     }
 
     private fun applyFilter(tabId: Int) {
