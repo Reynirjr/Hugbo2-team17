@@ -7,7 +7,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import com.google.android.material.button.MaterialButton
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -28,7 +27,7 @@ class MenuFragment : Fragment() {
     private lateinit var emptyText: TextView
     private lateinit var basketBarContainer: View
     private lateinit var basketBadge: TextView
-    private lateinit var btnOrderQueueStatus: MaterialButton
+    private lateinit var btnLastOrderStatus: TextView
     private lateinit var filterTabs: List<TextView>
 
     private var selectedTabId: Int = R.id.chipAll
@@ -48,7 +47,7 @@ class MenuFragment : Fragment() {
         emptyText = view.findViewById(R.id.tvEmpty)
         basketBarContainer = view.findViewById(R.id.basketBarContainer)
         basketBadge = view.findViewById(R.id.basketBadge)
-        btnOrderQueueStatus = view.findViewById(R.id.btnOrderQueueStatus)
+        btnLastOrderStatus = view.findViewById(R.id.btnLastOrderStatus)
 
         filterTabs = listOf(
             view.findViewById(R.id.chipAll),
@@ -62,7 +61,11 @@ class MenuFragment : Fragment() {
         recyclerView.adapter = adapter
 
         basketBarContainer.setOnClickListener { (activity as? MainActivity)?.openBasket() }
-        btnOrderQueueStatus.setOnClickListener { (activity as? MainActivity)?.openQueueOrderStatus() }
+        btnLastOrderStatus.setOnClickListener {
+            SessionManager.lastPlacedOrderId?.let { id ->
+                (activity as? MainActivity)?.openOrderStatus(id)
+            }
+        }
 
         filterTabs.forEach { tab ->
             tab.setOnClickListener { selectTab(tab.id) }
@@ -75,6 +78,12 @@ class MenuFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         updateBasketBadge()
+        updateLastOrderStatusShortcut()
+    }
+
+    private fun updateLastOrderStatusShortcut() {
+        val show = SessionManager.lastPlacedOrderId?.let { it > 0L } == true
+        btnLastOrderStatus.visibility = if (show) View.VISIBLE else View.GONE
     }
 
     private fun selectTab(tabId: Int) {
@@ -104,12 +113,6 @@ class MenuFragment : Fragment() {
             basketBarContainer.visibility = View.GONE
             basketBadge.visibility = View.GONE
         }
-    }
-
-    private fun updateWaitTimeHeader() {
-        SessionManager.restaurantQueueMinutes?.takeIf { it > 0 }?.let {
-            btnOrderQueueStatus.visibility = View.VISIBLE
-        } ?: run { btnOrderQueueStatus.visibility = View.GONE }
     }
 
     private fun applyFilter(tabId: Int) {
@@ -147,7 +150,6 @@ class MenuFragment : Fragment() {
                         emptyText.visibility = View.GONE
                         allItems = result.items
                         BasketService.setCurrentMenuItems(result.items)
-                        updateWaitTimeHeader()
                         applyFilter(selectedTabId)
                         updateBasketBadge()
                     }
@@ -159,7 +161,6 @@ class MenuFragment : Fragment() {
                         emptyText.visibility = View.GONE
                         allItems = HagaMenuData.items
                         BasketService.setCurrentMenuItems(HagaMenuData.items)
-                        updateWaitTimeHeader()
                         applyFilter(selectedTabId)
                         updateBasketBadge()
                     }
@@ -176,7 +177,6 @@ class MenuFragment : Fragment() {
                         emptyText.visibility = View.GONE
                         allItems = HagaMenuData.items
                         BasketService.setCurrentMenuItems(HagaMenuData.items)
-                        updateWaitTimeHeader()
                         applyFilter(selectedTabId)
                         updateBasketBadge()
                     }
