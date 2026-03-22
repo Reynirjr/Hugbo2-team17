@@ -73,7 +73,6 @@ class OrderStatusFragment : Fragment() {
         line1 = view.findViewById(R.id.line1)
         line2 = view.findViewById(R.id.line2)
         tvOrderId = view.findViewById(R.id.tvOrderId)
-        tvOrderStatus = view.findViewById(R.id.tvOrderStatus)
         tvCreatedAt = view.findViewById(R.id.tvCreatedAt)
         tvTotalIsk = view.findViewById(R.id.tvTotalIsk)
         tvEstimatedReadyAt = view.findViewById(R.id.tvEstimatedReadyAt)
@@ -270,7 +269,6 @@ class OrderStatusFragment : Fragment() {
                 progressStatus.visibility = View.GONE
 
                 if (order != null) {
-                    tvOrderStatus.text = order.status
                     updateProgress(order.status)
                     tvTotalIsk.text = order.totalIsk?.let { "$it ISK" } ?: "—"
                     createdAtMillis = order.createdAt?.let { parseIsoToMillis(it) }
