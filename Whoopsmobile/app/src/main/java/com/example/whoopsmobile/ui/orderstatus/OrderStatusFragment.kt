@@ -22,7 +22,13 @@ import java.util.concurrent.TimeUnit
 import kotlin.math.roundToInt
 
 class OrderStatusFragment : Fragment() {
-
+    private lateinit var step1: View
+    private lateinit var step2: View
+    private lateinit var step3: View
+    private lateinit var step4: View
+    private lateinit var line1: View
+    private lateinit var line2: View
+    private lateinit var line3: View
     private var orderId: Long = 0L
     private lateinit var tvOrderId: TextView
     private lateinit var tvOrderStatus: TextView
@@ -61,6 +67,11 @@ class OrderStatusFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        step1 = view.findViewById(R.id.step1)
+        step2 = view.findViewById(R.id.step2)
+        step3 = view.findViewById(R.id.step3)
+        line1 = view.findViewById(R.id.line1)
+        line2 = view.findViewById(R.id.line2)
         tvOrderId = view.findViewById(R.id.tvOrderId)
         tvOrderStatus = view.findViewById(R.id.tvOrderStatus)
         tvCreatedAt = view.findViewById(R.id.tvCreatedAt)
@@ -85,6 +96,48 @@ class OrderStatusFragment : Fragment() {
 
         loadOrderStatus()
         checkLocationPermissionAndUpdate()
+    }
+
+    private fun getStatusTextIcelandic(status: String?): String {
+        return when (status?.lowercase()) {
+            "received" -> getString(R.string.status_received)
+            "preparing" -> getString(R.string.status_preparing)
+            "ready" -> getString(R.string.status_ready)
+            "completed" -> getString(R.string.status_completed)
+            else -> status ?: "Óþekkt"
+        }
+    }
+
+    private fun updateProgress(status: String?) {
+        val currentStep = when (status?.lowercase()) {
+            "received" -> 1
+            "preparing" -> 2
+            "ready" -> 3
+            else -> 0
+        }
+
+        // Dots
+        val steps = listOf(step1, step2, step3)
+        steps.forEachIndexed { index, view ->
+            if (index < currentStep) {
+                view.setBackgroundResource(R.drawable.circle_active)
+            } else {
+                view.setBackgroundResource(R.drawable.circle_inactive)
+            }
+        }
+
+        // Lines
+        if (currentStep >= 2) {
+            line1.setBackgroundResource(R.drawable.progress_line_active)
+        } else {
+            line1.setBackgroundResource(R.drawable.progress_line_inactive)
+        }
+
+        if (currentStep >= 3) {
+            line2.setBackgroundResource(R.drawable.progress_line_active)
+        } else {
+            line2.setBackgroundResource(R.drawable.progress_line_inactive)
+        }
     }
 
     override fun onResume() {
@@ -204,11 +257,13 @@ class OrderStatusFragment : Fragment() {
         if (orderId <= 0L) return
 
         progressStatus.visibility = View.VISIBLE
-        tvOrderStatus.text = getString(R.string.order_status_loading)
+
 
         val act = activity
         Thread {
+
             val order = OrderService.getOrderStatus(orderId)
+
             act?.runOnUiThread {
                 if (act.isDestroyed) return@runOnUiThread
 
@@ -216,6 +271,7 @@ class OrderStatusFragment : Fragment() {
 
                 if (order != null) {
                     tvOrderStatus.text = order.status
+                    updateProgress(order.status)
                     tvTotalIsk.text = order.totalIsk?.let { "$it ISK" } ?: "—"
                     createdAtMillis = order.createdAt?.let { parseIsoToMillis(it) }
                     estimatedReadyAtMillis = order.estimatedReadyAt?.let { parseIsoToMillis(it) }

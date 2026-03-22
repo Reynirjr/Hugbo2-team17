@@ -72,14 +72,95 @@
                 android:textStyle="bold"
                 android:textColor="#291317"/>
 
-            <TextView
-                android:id="@+id/tvOrderStatus"
-                android:layout_width="wrap_content"
+
+            <LinearLayout
+                android:id="@+id/orderProgressContainer"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                android:textColor="#291317"/>
+                android:layout_marginTop="12dp"
+                android:orientation="vertical">
+
+                <!-- ROW 1: DOTS + LINES -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <!-- STEP 1 -->
+                    <View
+                        android:id="@+id/step1"
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:background="@drawable/circle_inactive"/>
+
+                    <!-- LINE 1 -->
+                    <View
+                        android:id="@+id/line1"
+                        android:layout_width="0dp"
+                        android:layout_height="3dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/progress_line_inactive"/>
+
+                    <!-- STEP 2 -->
+                    <View
+                        android:id="@+id/step2"
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:background="@drawable/circle_inactive"/>
+
+                    <!-- LINE 2 -->
+                    <View
+                        android:id="@+id/line2"
+                        android:layout_width="0dp"
+                        android:layout_height="3dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/progress_line_inactive"/>
+
+                    <!-- STEP 3 -->
+                    <View
+                        android:id="@+id/step3"
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:background="@drawable/circle_inactive"/>
+
+                </LinearLayout>
+
+                <!-- ROW 2: LABELS -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:orientation="horizontal"
+                    android:weightSum="3">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Móttekið"
+                        android:textSize="12sp"
+                        android:gravity="center"/>
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Í undirbúningi"
+                        android:textSize="12sp"
+                        android:gravity="center"/>
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Tilbúið"
+                        android:textSize="12sp"
+                        android:gravity="center"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
 
             <TextView
                 android:layout_width="wrap_content"
