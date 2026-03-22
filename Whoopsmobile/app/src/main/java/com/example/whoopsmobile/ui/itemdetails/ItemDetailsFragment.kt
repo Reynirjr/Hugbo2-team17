@@ -9,6 +9,8 @@ import android.widget.Button
 import android.widget.CheckBox
 import android.widget.ImageButton
 import android.widget.LinearLayout
+import android.widget.RadioButton
+import android.widget.RadioGroup
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -38,6 +40,19 @@ class ItemDetailsFragment : Fragment() {
     private var defaultIngredientIds: List<Int> = emptyList()
     private val checkedIngredientIds = mutableSetOf<Int>()
     private var ingredientsLoaded = false
+
+    // Mutual exclusivity pairs: ingredient name -> its "lítið" counterpart name
+    private val litidPairs = mapOf(
+        "Mæjó" to "Lítið mæjó",
+        "Lítið mæjó" to "Mæjó",
+        "Sinnep" to "Lítið sinnep",
+        "Lítið sinnep" to "Sinnep",
+        "Tómatsósa" to "Lítil tómatsósa",
+        "Lítil tómatsósa" to "Tómatsósa"
+    )
+
+    // Map ingredient IDs to their CheckBox widgets for programmatic unchecking
+    private val checkBoxMap = mutableMapOf<Int, CheckBox>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -103,20 +118,19 @@ class ItemDetailsFragment : Fragment() {
 
         btnAddToBasket.setOnClickListener {
             val addedIngredients = if (ingredientsLoaded) {
-                // Extras that were checked (not in defaults, or extras category always counted)
                 allIngredients.filter { ig ->
                     ig.id in checkedIngredientIds &&
-                    ig.extraPriceIsk > 0 &&
                     ig.id !in defaultIngredientIds
                 }
             } else emptyList()
 
-            val removedIds = if (ingredientsLoaded) {
-                // Default ingredients that were unchecked
-                defaultIngredientIds.filter { it !in checkedIngredientIds }
+            val removedIngredients = if (ingredientsLoaded) {
+                allIngredients.filter { ig ->
+                    ig.id in defaultIngredientIds && ig.id !in checkedIngredientIds
+                }
             } else emptyList()
 
-            BasketService.addItem(item, quantity, addedIngredients, removedIds)
+            BasketService.addItem(item, quantity, addedIngredients, removedIngredients)
             Toast.makeText(requireContext(), getString(R.string.add_to_basket), Toast.LENGTH_SHORT).show()
             (activity as? MainActivity)?.openBasketFromItemDetails()
         }
@@ -129,7 +143,6 @@ class ItemDetailsFragment : Fragment() {
             var ingredients = api.getIngredients()
             var defaultIds = api.getItemIngredientIds(itemId)
 
-            // Fallback to local data
             if (ingredients.isEmpty()) {
                 ingredients = HagaMenuData.ingredients
             }
@@ -150,6 +163,7 @@ class ItemDetailsFragment : Fragment() {
 
     private fun buildIngredientsUI() {
         ingredientsPanel.removeAllViews()
+        checkBoxMap.clear()
 
         val categoryOrder = listOf("extra", "ostur", "sosur", "alegg")
         val categoryNames = mapOf(
@@ -163,41 +177,97 @@ class ItemDetailsFragment : Fragment() {
             val catIngredients = allIngredients.filter { it.category == cat }
             if (catIngredients.isEmpty()) continue
 
-            // Category header
             val header = TextView(requireContext()).apply {
                 text = categoryNames[cat] ?: cat
                 textSize = 16f
                 setTypeface(null, Typeface.BOLD)
                 setTextColor(0xFF291317.toInt())
-                setPadding(0, 16, 0, 8)
+                setPadding(0, 24, 0, 8)
             }
             ingredientsPanel.addView(header)
 
-            // Checkboxes for each ingredient
-            for (ig in catIngredients) {
-                val label = if (ig.extraPriceIsk > 0) {
-                    "${ig.name} +${ig.extraPriceIsk} kr"
-                } else {
-                    ig.name
-                }
-
-                val cb = CheckBox(requireContext()).apply {
-                    text = label
-                    isChecked = ig.id in checkedIngredientIds
-                    textSize = 15f
-                    setTextColor(0xFF291317.toInt())
-                    setPadding(8, 4, 0, 4)
-                    setOnCheckedChangeListener { _, checked ->
-                        if (checked) {
-                            checkedIngredientIds.add(ig.id)
-                        } else {
-                            checkedIngredientIds.remove(ig.id)
-                        }
-                        updatePriceDisplay()
-                    }
-                }
-                ingredientsPanel.addView(cb)
+            if (cat == "ostur") {
+                buildCheeseRadioGroup(catIngredients)
+            } else {
+                buildCheckboxGroup(catIngredients)
             }
+        }
+    }
+
+    /** Cheese: radio-style — pick one or none. Tapping the selected one deselects it. */
+    private fun buildCheeseRadioGroup(cheeseIngredients: List<Ingredient>) {
+        val radioGroup = RadioGroup(requireContext()).apply {
+            orientation = RadioGroup.VERTICAL
+        }
+
+        // Determine which cheese is default-checked
+        val defaultCheese = cheeseIngredients.find { it.id in checkedIngredientIds }
+
+        for (ig in cheeseIngredients) {
+            val rb = RadioButton(requireContext()).apply {
+                text = ig.name
+                id = View.generateViewId()
+                textSize = 15f
+                setTextColor(0xFF291317.toInt())
+                setPadding(8, 4, 0, 4)
+                isChecked = ig.id in checkedIngredientIds
+            }
+            radioGroup.addView(rb)
+
+            // Allow deselecting by tapping the already-selected radio button
+            rb.setOnClickListener {
+                if (ig.id in checkedIngredientIds) {
+                    // Already was checked — deselect
+                    rb.isChecked = false
+                    radioGroup.clearCheck()
+                    checkedIngredientIds.remove(ig.id)
+                } else {
+                    // Remove all other cheese from checked set, add this one
+                    cheeseIngredients.forEach { checkedIngredientIds.remove(it.id) }
+                    checkedIngredientIds.add(ig.id)
+                }
+                updatePriceDisplay()
+            }
+        }
+
+        ingredientsPanel.addView(radioGroup)
+    }
+
+    /** Standard checkboxes with mutual-exclusivity for lítið pairs */
+    private fun buildCheckboxGroup(ingredients: List<Ingredient>) {
+        for (ig in ingredients) {
+            val label = if (ig.extraPriceIsk > 0) {
+                "${ig.name} +${ig.extraPriceIsk} kr"
+            } else {
+                ig.name
+            }
+
+            val cb = CheckBox(requireContext()).apply {
+                text = label
+                isChecked = ig.id in checkedIngredientIds
+                textSize = 15f
+                setTextColor(0xFF291317.toInt())
+                setPadding(8, 4, 0, 4)
+                setOnCheckedChangeListener { _, checked ->
+                    if (checked) {
+                        checkedIngredientIds.add(ig.id)
+                        // Enforce mutual exclusivity for lítið pairs
+                        val exclusiveName = litidPairs[ig.name]
+                        if (exclusiveName != null) {
+                            val exclusiveIg = allIngredients.find { it.name == exclusiveName }
+                            if (exclusiveIg != null && exclusiveIg.id in checkedIngredientIds) {
+                                checkedIngredientIds.remove(exclusiveIg.id)
+                                checkBoxMap[exclusiveIg.id]?.isChecked = false
+                            }
+                        }
+                    } else {
+                        checkedIngredientIds.remove(ig.id)
+                    }
+                    updatePriceDisplay()
+                }
+            }
+            checkBoxMap[ig.id] = cb
+            ingredientsPanel.addView(cb)
         }
     }
 
