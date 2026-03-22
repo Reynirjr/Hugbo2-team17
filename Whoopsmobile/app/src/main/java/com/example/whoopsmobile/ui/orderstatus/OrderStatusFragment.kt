@@ -73,7 +73,6 @@ class OrderStatusFragment : Fragment() {
         line1 = view.findViewById(R.id.line1)
         line2 = view.findViewById(R.id.line2)
         tvOrderId = view.findViewById(R.id.tvOrderId)
-        tvOrderStatus = view.findViewById(R.id.tvOrderStatus)
         tvCreatedAt = view.findViewById(R.id.tvCreatedAt)
         tvTotalIsk = view.findViewById(R.id.tvTotalIsk)
         tvEstimatedReadyAt = view.findViewById(R.id.tvEstimatedReadyAt)
