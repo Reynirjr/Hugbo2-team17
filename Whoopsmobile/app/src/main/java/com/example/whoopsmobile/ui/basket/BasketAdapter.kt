@@ -17,6 +17,7 @@ class BasketAdapter(
 
     inner class BasketViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val name: TextView = view.findViewById(R.id.tvBasketItemName)
+        val customizations: TextView = view.findViewById(R.id.tvBasketCustomizations)
         val quantity: TextView = view.findViewById(R.id.tvQuantity)
         val lineTotal: TextView = view.findViewById(R.id.tvLineTotal)
         val btnDecrease: ImageButton = view.findViewById(R.id.btnDecrease)
@@ -31,18 +32,29 @@ class BasketAdapter(
 
     override fun onBindViewHolder(holder: BasketViewHolder, position: Int) {
         val bi = items[position]
-        val customizations = mutableListOf<String>()
-        bi.addedIngredients.forEach { customizations.add("+ ${it.name}") }
-        if (bi.removedIngredientIds.isNotEmpty()) {
-            customizations.add("- ${bi.removedIngredientIds.size} fjarlægt")
-        }
-        holder.name.text = if (customizations.isNotEmpty()) {
-            "${bi.item.name}\n${customizations.joinToString(", ")}"
-        } else {
-            bi.item.name
-        }
+        holder.name.text = bi.item.name
         holder.quantity.text = bi.quantity.toString()
         holder.lineTotal.text = "${bi.lineTotal} ISK"
+
+        val lines = mutableListOf<String>()
+        for (ig in bi.addedIngredients) {
+            if (ig.extraPriceIsk > 0) {
+                lines.add("+ ${ig.name} (+${ig.extraPriceIsk} kr)")
+            } else {
+                lines.add("+ ${ig.name}")
+            }
+        }
+        for (ig in bi.removedIngredients) {
+            lines.add("- ${ig.name}")
+        }
+
+        if (lines.isNotEmpty()) {
+            holder.customizations.text = lines.joinToString("\n")
+            holder.customizations.visibility = View.VISIBLE
+        } else {
+            holder.customizations.visibility = View.GONE
+        }
+
         holder.btnDecrease.setOnClickListener {
             if (bi.quantity > 1) onQuantityChanged(bi, bi.quantity - 1)
             else onRemove(bi)
