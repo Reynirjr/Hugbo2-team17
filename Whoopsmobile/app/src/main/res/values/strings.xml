@@ -57,4 +57,8 @@
     <string name="status_preparing">Í undirbúningi</string>
     <string name="status_ready">Tilbúið</string>
     <string name="status_completed">Lokið</string>
+
+    <string name="queue_wait_unknown">Óþekkt</string>
+    <string name="timeline_step_queue_detail_with_wait">Áætlaður biðtími í röð er %s</string>
+    <string name="timeline_step_queue_detail_no_estimate">Engin biðtímaáætlun í boði</string>
 </resources>

@@ -25,10 +25,8 @@ class OrderStatusFragment : Fragment() {
     private lateinit var step1: View
     private lateinit var step2: View
     private lateinit var step3: View
-    private lateinit var step4: View
     private lateinit var line1: View
     private lateinit var line2: View
-    private lateinit var line3: View
     private var orderId: Long = 0L
     private lateinit var tvOrderId: TextView
     private lateinit var tvCreatedAt: TextView
@@ -72,6 +70,7 @@ class OrderStatusFragment : Fragment() {
         line1 = view.findViewById(R.id.line1)
         line2 = view.findViewById(R.id.line2)
         tvOrderId = view.findViewById(R.id.tvOrderId)
+        tvOrderStatus = view.findViewById(R.id.tvOrderStatus)
         tvCreatedAt = view.findViewById(R.id.tvCreatedAt)
         tvTotalIsk = view.findViewById(R.id.tvTotalIsk)
         tvEstimatedReadyAt = view.findViewById(R.id.tvEstimatedReadyAt)
@@ -258,6 +257,7 @@ class OrderStatusFragment : Fragment() {
                 progressStatus.visibility = View.GONE
 
                 if (order != null) {
+                    tvOrderStatus.text = getStatusTextIcelandic(order.status)
                     updateProgress(order.status)
                     tvTotalIsk.text = order.totalIsk?.let { "$it ISK" } ?: "—"
                     createdAtMillis = order.createdAt?.let { parseIsoToMillis(it) }
