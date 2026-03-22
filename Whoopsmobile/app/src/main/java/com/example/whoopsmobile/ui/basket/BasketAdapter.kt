@@ -31,7 +31,16 @@ class BasketAdapter(
 
     override fun onBindViewHolder(holder: BasketViewHolder, position: Int) {
         val bi = items[position]
-        holder.name.text = bi.item.name
+        val customizations = mutableListOf<String>()
+        bi.addedIngredients.forEach { customizations.add("+ ${it.name}") }
+        if (bi.removedIngredientIds.isNotEmpty()) {
+            customizations.add("- ${bi.removedIngredientIds.size} fjarlægt")
+        }
+        holder.name.text = if (customizations.isNotEmpty()) {
+            "${bi.item.name}\n${customizations.joinToString(", ")}"
+        } else {
+            bi.item.name
+        }
         holder.quantity.text = bi.quantity.toString()
         holder.lineTotal.text = "${bi.lineTotal} ISK"
         holder.btnDecrease.setOnClickListener {

@@ -2,6 +2,7 @@ package com.example.whoopsmobile.data.api
 
 import com.example.whoopsmobile.BuildConfig
 import android.util.Log
+import com.example.whoopsmobile.model.Ingredient
 import com.example.whoopsmobile.model.Item
 import com.example.whoopsmobile.model.Order
 import com.example.whoopsmobile.model.Restaurant
@@ -129,6 +130,57 @@ class ApiHelper {
         } catch (e: Exception) {
             Log.e("API", "getRestaurants failed", e)
             ApiResult.Error("Error: ${e.message ?: "check logcat"}")
+        }
+    }
+
+    /** Fetches all available ingredients ordered by display_order. */
+    fun getIngredients(): List<Ingredient> {
+        return try {
+            val url = URL("${ApiConstants.SUPABASE_URL}/rest/v1/ingredients?select=*&order=display_order")
+            val conn = url.openConnection() as HttpURLConnection
+            conn.requestMethod = "GET"
+            conn.setRequestProperty("apikey", ApiConstants.SUPABASE_ANON_KEY)
+            conn.setRequestProperty("Authorization", "Bearer ${ApiConstants.SUPABASE_ANON_KEY}")
+            conn.setRequestProperty("Accept", "application/json")
+            val code = conn.responseCode
+            val response: String = (if (code in 200..299) conn.inputStream else conn.errorStream)
+                ?.let { BufferedReader(InputStreamReader(it)).use { r -> r.readText() } } ?: ""
+            if (code !in 200..299 || response.isBlank()) return emptyList()
+            val arr = JSONArray(response)
+            (0 until arr.length()).map { i ->
+                val o = arr.getJSONObject(i)
+                Ingredient(
+                    id = o.getInt("id"),
+                    name = o.getString("name"),
+                    category = o.optString("category", ""),
+                    extraPriceIsk = o.optInt("extra_price_isk", 0),
+                    displayOrder = o.optInt("display_order", 0)
+                )
+            }
+        } catch (e: Exception) {
+            Log.e("API", "getIngredients failed", e)
+            emptyList()
+        }
+    }
+
+    /** Fetches default ingredient IDs for a given item. */
+    fun getItemIngredientIds(itemId: Int): List<Int> {
+        return try {
+            val url = URL("${ApiConstants.SUPABASE_URL}/rest/v1/item_ingredients?item_id=eq.$itemId&select=ingredient_id")
+            val conn = url.openConnection() as HttpURLConnection
+            conn.requestMethod = "GET"
+            conn.setRequestProperty("apikey", ApiConstants.SUPABASE_ANON_KEY)
+            conn.setRequestProperty("Authorization", "Bearer ${ApiConstants.SUPABASE_ANON_KEY}")
+            conn.setRequestProperty("Accept", "application/json")
+            val code = conn.responseCode
+            val response: String = (if (code in 200..299) conn.inputStream else conn.errorStream)
+                ?.let { BufferedReader(InputStreamReader(it)).use { r -> r.readText() } } ?: ""
+            if (code !in 200..299 || response.isBlank()) return emptyList()
+            val arr = JSONArray(response)
+            (0 until arr.length()).map { arr.getJSONObject(it).getInt("ingredient_id") }
+        } catch (e: Exception) {
+            Log.e("API", "getItemIngredientIds failed", e)
+            emptyList()
         }
     }
 
