@@ -28,6 +28,7 @@ class OrderStatusFragment : Fragment() {
     private lateinit var line2: View
     private var orderId: Long = 0L
     private lateinit var tvOrderId: TextView
+    private lateinit var tvOrderStatus: TextView
     private lateinit var tvCreatedAt: TextView
     private lateinit var tvTotalIsk: TextView
     private lateinit var tvEstimatedReadyAt: TextView
@@ -261,6 +262,15 @@ class OrderStatusFragment : Fragment() {
                 }
             }
         }.start()
+    }
+
+    private fun getStatusTextIcelandic(status: String?): String {
+        return when (status?.lowercase()) {
+            "received" -> getString(R.string.status_received)
+            "preparing" -> getString(R.string.status_preparing)
+            "ready" -> getString(R.string.status_ready)
+            else -> status?.ifBlank { null } ?: "—"
+        }
     }
 
     private fun parseIsoToMillis(iso: String): Long? {
