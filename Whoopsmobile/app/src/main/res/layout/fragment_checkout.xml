@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -88,14 +89,20 @@
                 android:textSize="18sp"
                 android:textStyle="bold"
                 android:textColor="#291317"/>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnConfirmOrder"
+                style="@style/Widget.MaterialComponents.Button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text="@string/confirm_order"
+                android:textColor="@color/cream"
+                android:textAllCaps="false"
+                app:backgroundTint="@color/brand_primary"
+                app:cornerRadius="999dp"
+                app:rippleColor="#40FFFFFF"
+                android:padding="16dp"/>
         </LinearLayout>
     </ScrollView>
-
-    <Button
-        android:id="@+id/btnConfirmOrder"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        android:text="@string/confirm_order"
-        android:padding="16dp"/>
 </LinearLayout>
