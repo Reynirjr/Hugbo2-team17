@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageButton
-import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -20,7 +19,6 @@ class BasketFragment : Fragment() {
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var tvBasketEmpty: TextView
-    private lateinit var basketFooter: LinearLayout
     private lateinit var tvTotal: TextView
     private lateinit var btnCheckout: Button
     private lateinit var adapter: BasketAdapter
@@ -36,7 +34,6 @@ class BasketFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         recyclerView = view.findViewById(R.id.rvBasket)
         tvBasketEmpty = view.findViewById(R.id.tvBasketEmpty)
-        basketFooter = view.findViewById(R.id.basketFooter)
         tvTotal = view.findViewById(R.id.tvTotal)
         btnCheckout = view.findViewById(R.id.btnCheckout)
         view.findViewById<ImageButton>(R.id.btnBack).setOnClickListener {
@@ -78,11 +75,12 @@ class BasketFragment : Fragment() {
         if (items.isEmpty()) {
             tvBasketEmpty.visibility = View.VISIBLE
             recyclerView.visibility = View.GONE
-            basketFooter.visibility = View.GONE
+            tvTotal.text = "0 ISK"
+            btnCheckout.visibility = View.GONE
         } else {
             tvBasketEmpty.visibility = View.GONE
             recyclerView.visibility = View.VISIBLE
-            basketFooter.visibility = View.VISIBLE
+            btnCheckout.visibility = View.VISIBLE
             adapter.updateItems(items)
             val total = BasketService.calculateTotal()
             tvTotal.text = "$total ISK"
