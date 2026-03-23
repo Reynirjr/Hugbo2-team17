@@ -18,6 +18,7 @@ import com.example.whoopsmobile.data.api.ApiHelper
 import com.example.whoopsmobile.data.api.ApiResult
 import com.example.whoopsmobile.model.Item
 import com.example.whoopsmobile.service.BasketService
+import com.example.whoopsmobile.service.OrderService
 import com.example.whoopsmobile.service.SessionManager
 
 class MenuFragment : Fragment() {
@@ -27,7 +28,12 @@ class MenuFragment : Fragment() {
     private lateinit var emptyText: TextView
     private lateinit var basketBarContainer: View
     private lateinit var basketBadge: TextView
-    private lateinit var btnLastOrderStatus: TextView
+    private lateinit var btnLastOrderStatus: View
+    private lateinit var statusShortcutStep1: View
+    private lateinit var statusShortcutStep2: View
+    private lateinit var statusShortcutStep3: View
+    private lateinit var statusShortcutLine1: View
+    private lateinit var statusShortcutLine2: View
     private lateinit var filterTabs: List<TextView>
 
     private var selectedTabId: Int = R.id.chipAll
@@ -48,6 +54,11 @@ class MenuFragment : Fragment() {
         basketBarContainer = view.findViewById(R.id.basketBarContainer)
         basketBadge = view.findViewById(R.id.basketBadge)
         btnLastOrderStatus = view.findViewById(R.id.btnLastOrderStatus)
+        statusShortcutStep1 = view.findViewById(R.id.statusShortcutStep1)
+        statusShortcutStep2 = view.findViewById(R.id.statusShortcutStep2)
+        statusShortcutStep3 = view.findViewById(R.id.statusShortcutStep3)
+        statusShortcutLine1 = view.findViewById(R.id.statusShortcutLine1)
+        statusShortcutLine2 = view.findViewById(R.id.statusShortcutLine2)
 
         filterTabs = listOf(
             view.findViewById(R.id.chipAll),
@@ -82,8 +93,55 @@ class MenuFragment : Fragment() {
     }
 
     private fun updateLastOrderStatusShortcut() {
-        val show = SessionManager.lastPlacedOrderId?.let { it > 0L } == true
+        val orderId = SessionManager.lastPlacedOrderId
+        val show = orderId?.let { it > 0L } == true
         btnLastOrderStatus.visibility = if (show) View.VISIBLE else View.GONE
+        if (show && orderId != null) {
+            updateStatusShortcutProgress(null)
+            loadLastOrderStatusProgress(orderId)
+        }
+    }
+
+    private fun loadLastOrderStatusProgress(orderId: Long) {
+        val act = activity ?: return
+        Thread {
+            val order = OrderService.getOrderStatus(orderId)
+            act.runOnUiThread {
+                if (!isAdded) return@runOnUiThread
+                if (SessionManager.lastPlacedOrderId != orderId) return@runOnUiThread
+                updateStatusShortcutProgress(order?.status)
+            }
+        }.start()
+    }
+
+    private fun updateStatusShortcutProgress(status: String?) {
+        val currentStep = when (status?.lowercase()) {
+            "received" -> 1
+            "preparing" -> 2
+            "ready" -> 3
+            else -> 0
+        }
+
+        val steps = listOf(statusShortcutStep1, statusShortcutStep2, statusShortcutStep3)
+        steps.forEachIndexed { index, view ->
+            if (index < currentStep) {
+                view.setBackgroundResource(R.drawable.circle_active)
+            } else {
+                view.setBackgroundResource(R.drawable.circle_inactive)
+            }
+        }
+
+        if (currentStep >= 2) {
+            statusShortcutLine1.setBackgroundResource(R.drawable.progress_line_active)
+        } else {
+            statusShortcutLine1.setBackgroundResource(R.drawable.progress_line_inactive)
+        }
+
+        if (currentStep >= 3) {
+            statusShortcutLine2.setBackgroundResource(R.drawable.progress_line_active)
+        } else {
+            statusShortcutLine2.setBackgroundResource(R.drawable.progress_line_inactive)
+        }
     }
 
     private fun selectTab(tabId: Int) {

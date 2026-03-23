@@ -37,6 +37,7 @@
     <string name="order_placed_message">Pöntun þín hefur verið send.</string>
     <string name="order_error">Ekki tókst að senda pöntun</string>
     <string name="order_status_title">Staða pöntunar</string>
+    <string name="order_status_shortcut_label">Staðan</string>
     <string name="order_id_label">Pöntunarnúmer</string>
     <string name="order_status_label">Staða</string>
     <string name="refresh_status">Uppfæra stöðu</string>

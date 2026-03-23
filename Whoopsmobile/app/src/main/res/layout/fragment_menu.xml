@@ -25,7 +25,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:gravity="center">
+                android:gravity="start|center_vertical">
 
                 <ImageView
                     android:layout_width="wrap_content"
@@ -34,31 +34,73 @@
                     android:contentDescription="@string/menu"
                     android:scaleType="fitCenter"
                     android:adjustViewBounds="true"/>
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/menu_subtitle"
-                    android:textSize="14sp"
-                    android:textColor="#F6F4E4"
-                    android:layout_marginTop="4dp"/>
             </LinearLayout>
 
-            <TextView
+            <LinearLayout
                 android:id="@+id/btnLastOrderStatus"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="top|end"
+                android:orientation="vertical"
+                android:gravity="center_horizontal"
                 android:padding="8dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:text="@string/order_status_title"
-                android:textColor="#F6F4E4"
-                android:textSize="13sp"
-                android:textStyle="bold"
                 android:visibility="gone"
                 android:focusable="true"
                 android:clickable="true"
-                android:contentDescription="@string/order_status_title"/>
+                android:contentDescription="@string/order_status_shortcut_label">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginBottom="4dp">
+
+                    <View
+                        android:id="@+id/statusShortcutStep1"
+                        android:layout_width="7dp"
+                        android:layout_height="7dp"
+                        android:background="@drawable/circle_inactive" />
+
+                    <View
+                        android:id="@+id/statusShortcutLine1"
+                        android:layout_width="12dp"
+                        android:layout_height="2dp"
+                        android:layout_marginStart="2dp"
+                        android:layout_marginEnd="2dp"
+                        android:background="@drawable/progress_line_inactive" />
+
+                    <View
+                        android:id="@+id/statusShortcutStep2"
+                        android:layout_width="7dp"
+                        android:layout_height="7dp"
+                        android:background="@drawable/circle_inactive" />
+
+                    <View
+                        android:id="@+id/statusShortcutLine2"
+                        android:layout_width="12dp"
+                        android:layout_height="2dp"
+                        android:layout_marginStart="2dp"
+                        android:layout_marginEnd="2dp"
+                        android:background="@drawable/progress_line_inactive" />
+
+                    <View
+                        android:id="@+id/statusShortcutStep3"
+                        android:layout_width="7dp"
+                        android:layout_height="7dp"
+                        android:background="@drawable/circle_inactive" />
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/order_status_shortcut_label"
+                    android:textColor="#F6F4E4"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
         </FrameLayout>
 
         <!-- Filter tabs row inside the banner -->
@@ -134,69 +176,75 @@
         android:visibility="gone"
         android:layout_marginTop="40dp"/>
 
-    <!-- Menu List (scrolls; cart bar below stays fixed) -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvItems"
+    <!-- Menu List with bottom overlay cart button -->
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:padding="12dp"
-        android:background="#F6F4E4"
-        android:clipToPadding="false"/>
+        android:layout_weight="1">
 
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/basketBarContainer"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="16dp"
-        android:clickable="true"
-        android:focusable="true"
-        android:visibility="gone"
-        android:contentDescription="@string/your_basket"
-        app:cardBackgroundColor="@color/brand_primary"
-        app:cardCornerRadius="999dp"
-        app:cardElevation="6dp"
-        app:rippleColor="#40FFFFFF"
-        app:strokeWidth="0dp">
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvItems"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="12dp"
+            android:paddingBottom="88dp"
+            android:background="#F6F4E4"
+            android:clipToPadding="false"/>
 
-        <LinearLayout
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/basketBarContainer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical"
-            android:paddingStart="28dp"
-            android:paddingEnd="28dp"
-            android:paddingTop="14dp"
-            android:paddingBottom="14dp">
+            android:layout_gravity="bottom|center_horizontal"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginBottom="12dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:visibility="gone"
+            android:contentDescription="@string/your_basket"
+            app:cardBackgroundColor="@color/brand_primary"
+            app:cardCornerRadius="999dp"
+            app:cardElevation="0dp"
+            app:rippleColor="#40FFFFFF"
+            app:strokeColor="@android:color/transparent"
+            app:strokeWidth="0dp">
 
-            <TextView
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/your_basket"
-                android:textColor="@color/cream"
-                android:textSize="17sp"
-                android:textStyle="bold"/>
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingStart="20dp"
+                android:paddingEnd="20dp"
+                android:paddingTop="12dp"
+                android:paddingBottom="12dp">
 
-            <TextView
-                android:id="@+id/basketBadge"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="12dp"
-                android:minWidth="26dp"
-                android:minHeight="26dp"
-                android:background="@drawable/badge_background"
-                android:gravity="center"
-                android:textColor="@color/brand_primary"
-                android:textSize="13sp"
-                android:textStyle="bold"
-                android:visibility="gone"
-                android:paddingStart="8dp"
-                android:paddingEnd="8dp"/>
-        </LinearLayout>
-    </com.google.android.material.card.MaterialCardView>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/your_basket"
+                    android:textColor="@color/cream"
+                    android:textSize="16sp"
+                    android:textStyle="bold"/>
+
+                <TextView
+                    android:id="@+id/basketBadge"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:minWidth="24dp"
+                    android:minHeight="24dp"
+                    android:background="@drawable/badge_background"
+                    android:gravity="center"
+                    android:textColor="@color/brand_primary"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:visibility="gone"
+                    android:paddingStart="7dp"
+                    android:paddingEnd="7dp"/>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+    </FrameLayout>
 
 </LinearLayout>
