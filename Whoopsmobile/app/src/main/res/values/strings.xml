@@ -67,4 +67,12 @@
     <string name="timeline_step_ready_title">Tilbúið til að sækja</string>
     <string name="timeline_step_pending_hint">Eftir að pöntun er send</string>
     <string name="queue_wait_unknown">Engin áætlun</string>
+    <string name="combo_step_of">Skref %1$d af %2$d</string>
+    <string name="combo_next">Næsta</string>
+    <string name="combo_included">Innifalið</string>
+    <string name="combo_upgrade">+%d kr</string>
+    <string name="combo_select_count">Veldu %d</string>
+    <string name="combo_selected_count">%1$d af %2$d valið</string>
+    <string name="combo_pick_required">Vinsamlegast veldu áður en þú heldur áfram</string>
+    <string name="combo_fries_included">Stórar franskar innifaldar</string>
 </resources>

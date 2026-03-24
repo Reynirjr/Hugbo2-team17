@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.whoopsmobile.MainActivity
 import com.example.whoopsmobile.R
+import com.example.whoopsmobile.data.ComboDefinitions
 import com.example.whoopsmobile.data.HagaMenuData
 import com.example.whoopsmobile.data.api.ApiHelper
 import com.example.whoopsmobile.data.api.ApiResult
@@ -68,7 +69,13 @@ class MenuFragment : Fragment() {
         )
 
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
-        adapter = MenuAdapter(emptyList()) { item -> (activity as? MainActivity)?.openItemDetails(item.id) }
+        adapter = MenuAdapter(emptyList()) { item ->
+            if (ComboDefinitions.isCombo(item.id)) {
+                (activity as? MainActivity)?.openComboBuilder(item.id)
+            } else {
+                (activity as? MainActivity)?.openItemDetails(item.id)
+            }
+        }
         recyclerView.adapter = adapter
 
         basketBarContainer.setOnClickListener { (activity as? MainActivity)?.openBasket() }

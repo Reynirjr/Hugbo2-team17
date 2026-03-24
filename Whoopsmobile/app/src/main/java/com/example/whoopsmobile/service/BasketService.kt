@@ -4,17 +4,13 @@ import android.content.Context
 import android.content.SharedPreferences
 import com.example.whoopsmobile.model.Basket
 import com.example.whoopsmobile.model.BasketItem
+import com.example.whoopsmobile.model.ComboSelection
 import com.example.whoopsmobile.model.Ingredient
 import com.example.whoopsmobile.model.Item
 import org.json.JSONArray
 import org.json.JSONObject
 import java.util.UUID
 
-/**
- * Holds the current basket and provides add, remove, update quantity, total.
- * Persists basket to local storage (SharedPreferences) so it survives app restarts.
- * Aligns with UML: BasketService manages one Basket; used by MenuFragment, ItemDetailsFragment, BasketFragment.
- */
 object BasketService {
 
     private const val PREFS_NAME = "whoops_basket"
@@ -23,7 +19,6 @@ object BasketService {
     private val basket = Basket()
     private var prefs: SharedPreferences? = null
 
-    /** Current menu items for lookup when opening item details by id. Set by MenuFragment after load. */
     var currentMenuItems: List<Item> = emptyList()
         private set
 
@@ -46,18 +41,48 @@ object BasketService {
                 val item = parseItem(ob.getJSONObject("item"))
                 val addedIngredients = parseIngredientArray(ob.optJSONArray("addedIngredients"))
                 val removedIngredients = parseIngredientArray(ob.optJSONArray("removedIngredients"))
+                val comboSelections = parseComboSelections(ob.optJSONArray("comboSelections"))
                 basket.items.add(
                     BasketItem(
                         id = ob.optString("id", UUID.randomUUID().toString()),
                         item = item,
                         quantity = ob.optInt("quantity", 1).coerceAtLeast(1),
                         addedIngredients = addedIngredients,
-                        removedIngredients = removedIngredients
+                        removedIngredients = removedIngredients,
+                        comboSelections = comboSelections
                     )
                 )
             }
         } catch (_: Exception) {
             // Ignore corrupt or old-format data
+        }
+    }
+
+    private fun parseComboSelections(arr: JSONArray?): List<ComboSelection> {
+        if (arr == null) return emptyList()
+        return (0 until arr.length()).map { k ->
+            val ob = arr.getJSONObject(k)
+            ComboSelection(
+                stepLabel = ob.optString("stepLabel", ""),
+                item = parseItem(ob.getJSONObject("item")),
+                priceDelta = ob.optInt("priceDelta", 0),
+                addedIngredients = parseIngredientArray(ob.optJSONArray("addedIngredients")),
+                removedIngredients = parseIngredientArray(ob.optJSONArray("removedIngredients"))
+            )
+        }
+    }
+
+    private fun comboSelectionsToJsonArray(selections: List<ComboSelection>): JSONArray {
+        return JSONArray().apply {
+            selections.forEach { sel ->
+                put(JSONObject().apply {
+                    put("stepLabel", sel.stepLabel)
+                    put("item", itemToJson(sel.item))
+                    put("priceDelta", sel.priceDelta)
+                    put("addedIngredients", ingredientToJsonArray(sel.addedIngredients))
+                    put("removedIngredients", ingredientToJsonArray(sel.removedIngredients))
+                })
+            }
         }
     }
 
@@ -99,6 +124,7 @@ object BasketService {
                     put("item", itemToJson(bi.item))
                     put("addedIngredients", ingredientToJsonArray(bi.addedIngredients))
                     put("removedIngredients", ingredientToJsonArray(bi.removedIngredients))
+                    put("comboSelections", comboSelectionsToJsonArray(bi.comboSelections))
                 }
             )
         }
@@ -144,6 +170,7 @@ object BasketService {
         require(quantity > 0) { "Quantity must be positive" }
         val existing = basket.items.find {
             it.item.id == item.id &&
+            !it.isCombo &&
             it.addedIngredients == addedIngredients &&
             it.removedIngredients == removedIngredients
         }
@@ -161,6 +188,20 @@ object BasketService {
                 )
             )
         }
+        saveBasket()
+    }
+
+    /** Add a combo item to basket. Each combo is unique (never merged). */
+    fun addComboItem(comboItem: Item, quantity: Int, selections: List<ComboSelection>) {
+        require(quantity > 0) { "Quantity must be positive" }
+        basket.items.add(
+            BasketItem(
+                id = UUID.randomUUID().toString(),
+                item = comboItem,
+                quantity = quantity,
+                comboSelections = selections
+            )
+        )
         saveBasket()
     }
 

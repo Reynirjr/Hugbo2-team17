@@ -37,15 +37,33 @@ class BasketAdapter(
         holder.lineTotal.text = "${bi.lineTotal} ISK"
 
         val lines = mutableListOf<String>()
-        for (ig in bi.addedIngredients) {
-            if (ig.extraPriceIsk > 0) {
-                lines.add("+ ${ig.name} (+${ig.extraPriceIsk} kr)")
-            } else {
-                lines.add("+ ${ig.name}")
+
+        if (bi.isCombo) {
+            for (sel in bi.comboSelections) {
+                val deltaText = if (sel.priceDelta > 0) " (+${sel.priceDelta} kr)" else ""
+                lines.add("${sel.stepLabel}: ${sel.item.name}${deltaText}")
+                for (ig in sel.addedIngredients) {
+                    if (ig.extraPriceIsk > 0) {
+                        lines.add("  + ${ig.name} (+${ig.extraPriceIsk} kr)")
+                    } else {
+                        lines.add("  + ${ig.name}")
+                    }
+                }
+                for (ig in sel.removedIngredients) {
+                    lines.add("  - ${ig.name}")
+                }
             }
-        }
-        for (ig in bi.removedIngredients) {
-            lines.add("- ${ig.name}")
+        } else {
+            for (ig in bi.addedIngredients) {
+                if (ig.extraPriceIsk > 0) {
+                    lines.add("+ ${ig.name} (+${ig.extraPriceIsk} kr)")
+                } else {
+                    lines.add("+ ${ig.name}")
+                }
+            }
+            for (ig in bi.removedIngredients) {
+                lines.add("- ${ig.name}")
+            }
         }
 
         if (lines.isNotEmpty()) {

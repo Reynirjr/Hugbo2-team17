@@ -8,17 +8,10 @@ import java.util.TimeZone
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-/**
- * US3: Place order. Creates order in Supabase with customer_phone, menu_id, items, total, estimated_ready_at.
- * UML: OrderService createOrder(basket, phone): Order; getOrderStatus(orderId): Order.
- */
 object OrderService {
 
     private const val DEFAULT_QUEUE_MINUTES = 20
 
-    /**
-     * Creates order from current basket. Returns Order (id + status) or null on failure.
-     */
     fun createOrder(): Order? {
         val phone = SessionManager.customerPhone ?: return null
         val menuId = SessionManager.currentMenuId
@@ -30,16 +23,31 @@ object OrderService {
         cal.add(Calendar.MINUTE, queueMinutes)
         val estimatedReadyAt = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.US).apply { timeZone = TimeZone.getTimeZone("UTC") }.format(cal.time)
         val lines = basket.items.map { bi ->
-            OrderLine(
-                itemId = bi.item.id.toLong(),
-                itemName = bi.item.name,
-                priceIsk = bi.item.priceIsk,
-                quantity = bi.quantity
-            )
+            if (bi.isCombo) {
+                val details = bi.comboSelections.joinToString("; ") { sel ->
+                    val parts = mutableListOf(sel.item.name)
+                    if (sel.priceDelta > 0) parts.add("+${sel.priceDelta}kr")
+                    sel.addedIngredients.forEach { parts.add("+${it.name}") }
+                    sel.removedIngredients.forEach { parts.add("-${it.name}") }
+                    parts.joinToString(" ")
+                }
+                OrderLine(
+                    itemId = bi.item.id.toLong(),
+                    itemName = "${bi.item.name} (${details})",
+                    priceIsk = bi.item.priceIsk + bi.comboExtrasTotal,
+                    quantity = bi.quantity
+                )
+            } else {
+                OrderLine(
+                    itemId = bi.item.id.toLong(),
+                    itemName = bi.item.name,
+                    priceIsk = bi.item.priceIsk + bi.extrasTotal,
+                    quantity = bi.quantity
+                )
+            }
         }
         return ApiHelper().createOrder(phone, menuId, totalIsk, estimatedReadyAt, lines)
     }
 
-    /** Fetches order status by id (UML: getOrderStatus(orderId): Order). */
     fun getOrderStatus(orderId: Long): Order? = ApiHelper().getOrderStatus(orderId)
 }

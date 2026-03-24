@@ -22,7 +22,12 @@ class CheckoutAdapter(private var items: List<BasketItem>) : RecyclerView.Adapte
 
     override fun onBindViewHolder(holder: RowViewHolder, position: Int) {
         val bi = items[position]
-        holder.name.text = "${bi.quantity} x ${bi.item.name}"
+        if (bi.isCombo) {
+            val details = bi.comboSelections.joinToString(", ") { it.item.name }
+            holder.name.text = "${bi.quantity} x ${bi.item.name}\n  ($details)"
+        } else {
+            holder.name.text = "${bi.quantity} x ${bi.item.name}"
+        }
         holder.line.text = "${bi.lineTotal} ISK"
     }
 
