@@ -29,7 +29,13 @@ object HagaMenuData {
         Ingredient(13, "Pikklaðar gúrkur", "alegg", 0, 17),
         Ingredient(14, "Kál", "alegg", 0, 18),
         Ingredient(15, "Tómatur", "alegg", 0, 19),
-        Ingredient(16, "Rauður laukur", "alegg", 0, 20)
+        Ingredient(16, "Rauður laukur", "alegg", 0, 20),
+        // New ingredients for sides
+        Ingredient(21, "Cheddar ostasósa", "sosur", 0, 21),
+        Ingredient(22, "Vorlaukur", "alegg", 0, 22),
+        Ingredient(23, "Pikklaður chili", "alegg", 0, 23),
+        Ingredient(24, "Hvitlauksmæjó", "sosur", 0, 24),
+        Ingredient(25, "Kokteilsósa", "sosur", 0, 25)
     )
 
     /** Default ingredient IDs per item (matching fallback item IDs) */
@@ -41,9 +47,9 @@ object HagaMenuData {
         9 to listOf(3, 16, 14, 15, 5, 6, 7),  // Ostabörger einfaldur
         10 to listOf(3, 16, 14, 15, 5, 6, 7), // Ostabörger tvöfaldur
         11 to listOf(3, 7),              // Barnabörger
-        12 to listOf(8, 9),             // Spæsí vegan vængir
-        15 to listOf(9, 8),             // Spæsí franskar
-        16 to listOf(3)                 // Ostafranskar
+        12 to listOf(24, 8, 22, 23),    // Spæsí vegan vængir: hvitlauksmæjó, siracha, vorlaukur, pikklaður chili
+        15 to listOf(5, 8, 22, 23),    // Spæsí franskar: mæjó, siracha, vorlaukur, pikklaður chili
+        16 to listOf(21, 8, 22, 23)    // Ostafranskar: cheddar ostasósa, siracha, vorlaukur, pikklaður chili
     )
 
     val items: List<Item> = listOf(
@@ -227,7 +233,7 @@ object HagaMenuData {
             description = "Coke, Coke Zero, Appelsín, Toppur",
             priceIsk = 390,
             available = true,
-            tags = "vegan",
+            tags = "vegan,drykkir",
             imageData = null,
             estimatedWaitTimeMinutes = 10
         ),
@@ -237,7 +243,88 @@ object HagaMenuData {
             description = "Djús",
             priceIsk = 290,
             available = true,
-            tags = "vegan",
+            tags = "vegan,drykkir",
+            imageData = null,
+            estimatedWaitTimeMinutes = 10
+        ),
+        // —— Individual drinks (for combo selection) ——
+        Item(
+            id = 20,
+            name = "Coca Cola",
+            description = "330ml",
+            priceIsk = 390,
+            available = true,
+            tags = "vegan,combo_drykkir",
+            imageData = null,
+            estimatedWaitTimeMinutes = 10
+        ),
+        Item(
+            id = 21,
+            name = "Coca Cola Zero",
+            description = "330ml",
+            priceIsk = 390,
+            available = true,
+            tags = "vegan,combo_drykkir",
+            imageData = null,
+            estimatedWaitTimeMinutes = 10
+        ),
+        Item(
+            id = 22,
+            name = "Sprite",
+            description = "330ml",
+            priceIsk = 390,
+            available = true,
+            tags = "vegan,combo_drykkir",
+            imageData = null,
+            estimatedWaitTimeMinutes = 10
+        ),
+        Item(
+            id = 23,
+            name = "Appelsín",
+            description = "330ml",
+            priceIsk = 390,
+            available = true,
+            tags = "vegan,combo_drykkir",
+            imageData = null,
+            estimatedWaitTimeMinutes = 10
+        ),
+        Item(
+            id = 24,
+            name = "Toppur",
+            description = "330ml",
+            priceIsk = 390,
+            available = true,
+            tags = "vegan,combo_drykkir",
+            imageData = null,
+            estimatedWaitTimeMinutes = 10
+        ),
+        Item(
+            id = 25,
+            name = "Bon Aqua",
+            description = "330ml",
+            priceIsk = 390,
+            available = true,
+            tags = "vegan,combo_drykkir",
+            imageData = null,
+            estimatedWaitTimeMinutes = 10
+        ),
+        Item(
+            id = 26,
+            name = "Eplasafi",
+            description = "Djús",
+            priceIsk = 290,
+            available = true,
+            tags = "vegan,combo_drykkir",
+            imageData = null,
+            estimatedWaitTimeMinutes = 10
+        ),
+        Item(
+            id = 27,
+            name = "Appelsínusafi",
+            description = "Djús",
+            priceIsk = 290,
+            available = true,
+            tags = "vegan,combo_drykkir",
             imageData = null,
             estimatedWaitTimeMinutes = 10
         )

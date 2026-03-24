@@ -17,6 +17,7 @@ import androidx.fragment.app.Fragment
 import com.example.whoopsmobile.MainActivity
 import com.example.whoopsmobile.R
 import com.example.whoopsmobile.data.HagaMenuData
+import com.example.whoopsmobile.data.IngredientRestrictions
 import com.example.whoopsmobile.data.api.ApiHelper
 import com.example.whoopsmobile.model.Ingredient
 import com.example.whoopsmobile.service.BasketService
@@ -102,26 +103,31 @@ class ItemDetailsFragment : Fragment() {
             tvQuantity.text = quantity.toString()
         }
 
-        btnBreyta.setOnClickListener {
-            if (ingredientsPanel.visibility == View.GONE) {
-                if (!ingredientsLoaded) {
-                    loadIngredients()
+        // Hide Breyta for items with no customization
+        if (itemId in IngredientRestrictions.noCustomization) {
+            btnBreyta.visibility = View.GONE
+        } else {
+            btnBreyta.setOnClickListener {
+                if (ingredientsPanel.visibility == View.GONE) {
+                    if (!ingredientsLoaded) {
+                        loadIngredients()
+                    }
+                    ingredientsPanel.visibility = View.VISIBLE
+                    btnBreyta.text = getString(R.string.breyta) + " ▲"
+                } else {
+                    ingredientsPanel.visibility = View.GONE
+                    btnBreyta.text = getString(R.string.breyta) + " ▼"
                 }
-                ingredientsPanel.visibility = View.VISIBLE
-                btnBreyta.text = getString(R.string.breyta) + " ▲"
-            } else {
-                ingredientsPanel.visibility = View.GONE
-                btnBreyta.text = getString(R.string.breyta) + " ▼"
             }
+            btnBreyta.text = getString(R.string.breyta) + " ▼"
         }
-        btnBreyta.text = getString(R.string.breyta) + " ▼"
 
         btnAddToBasket.setOnClickListener {
             val addedIngredients = if (ingredientsLoaded) {
                 allIngredients.filter { ig ->
                     ig.id in checkedIngredientIds &&
                     ig.id !in defaultIngredientIds
-                }
+                }.map { ig -> applyPriceOverrides(ig) }
             } else emptyList()
 
             val removedIngredients = if (ingredientsLoaded) {
@@ -130,10 +136,31 @@ class ItemDetailsFragment : Fragment() {
                 }
             } else emptyList()
 
-            BasketService.addItem(item, quantity, addedIngredients, removedIngredients)
+            // Apply auka ostur doubling when auka kjöt is also added
+            val finalAdded = applyAukaOsturDoubling(addedIngredients)
+
+            BasketService.addItem(item, quantity, finalAdded, removedIngredients)
             Toast.makeText(requireContext(), getString(R.string.add_to_basket), Toast.LENGTH_SHORT).show()
             (activity as? MainActivity)?.openBasketFromItemDetails()
         }
+    }
+
+    /** When auka kjöt is selected, double the price of auka ostur (2 patties = 2 cheeses) */
+    private fun applyAukaOsturDoubling(ingredients: List<Ingredient>): List<Ingredient> {
+        val hasAukaKjot = ingredients.any { it.id == 1 } // Auka kjöt
+        if (!hasAukaKjot) return ingredients
+        return ingredients.map { ig ->
+            if (ig.id == 2 || ig.id == 17) { // Auka ostur or Auka vegan ostur
+                ig.copy(extraPriceIsk = ig.extraPriceIsk * 2)
+            } else ig
+        }
+    }
+
+    /** Apply context-dependent price overrides for specific items */
+    private fun applyPriceOverrides(ig: Ingredient): Ingredient {
+        val overrides = IngredientRestrictions.priceOverrides[itemId] ?: return ig
+        val overridePrice = overrides[ig.id] ?: return ig
+        return ig.copy(extraPriceIsk = overridePrice)
     }
 
     private fun loadIngredients() {
@@ -150,13 +177,32 @@ class ItemDetailsFragment : Fragment() {
                 defaultIds = HagaMenuData.itemIngredientDefaults[itemId] ?: emptyList()
             }
 
+            // Apply ingredient restrictions: filter to only allowed ingredients for this item
+            val allowedIds = IngredientRestrictions.allowedIngredientIds[itemId]
+            if (allowedIds != null) {
+                ingredients = ingredients.filter { it.id in allowedIds }
+            }
+
+            // Apply price overrides for display
+            val overrides = IngredientRestrictions.priceOverrides[itemId]
+            if (overrides != null) {
+                ingredients = ingredients.map { ig ->
+                    val override = overrides[ig.id]
+                    if (override != null) ig.copy(extraPriceIsk = override) else ig
+                }
+            }
+
             allIngredients = ingredients
             defaultIngredientIds = defaultIds
             checkedIngredientIds.clear()
-            checkedIngredientIds.addAll(defaultIds)
+            checkedIngredientIds.addAll(defaultIds.filter { id -> ingredients.any { it.id == id } })
 
             activity?.runOnUiThread {
-                buildIngredientsUI()
+                if (itemId == IngredientRestrictions.kidsBurgerItemId) {
+                    buildKidsBurgerUI()
+                } else {
+                    buildIngredientsUI()
+                }
             }
         }.start()
     }
@@ -164,6 +210,8 @@ class ItemDetailsFragment : Fragment() {
     private fun buildIngredientsUI() {
         ingredientsPanel.removeAllViews()
         checkBoxMap.clear()
+
+        val isRadioSauce = itemId in IngredientRestrictions.sauceRadioItemIds
 
         val categoryOrder = listOf("extra", "ostur", "sosur", "alegg")
         val categoryNames = mapOf(
@@ -186,12 +234,47 @@ class ItemDetailsFragment : Fragment() {
             }
             ingredientsPanel.addView(header)
 
-            if (cat == "ostur") {
-                buildCheeseRadioGroup(catIngredients)
-            } else {
-                buildCheckboxGroup(catIngredients)
+            when {
+                cat == "ostur" -> buildCheeseRadioGroup(catIngredients)
+                cat == "sosur" && isRadioSauce -> buildSauceRadioGroup(catIngredients)
+                else -> buildCheckboxGroup(catIngredients)
             }
         }
+    }
+
+    /** Barnabörger: limited customization - extras + sauce radio only, no toppings */
+    private fun buildKidsBurgerUI() {
+        ingredientsPanel.removeAllViews()
+        checkBoxMap.clear()
+
+        // Extras section (auka kjöt, auka ostur)
+        val extras = allIngredients.filter { it.id in IngredientRestrictions.kidsBurgerAllowedExtraIds }
+        if (extras.isNotEmpty()) {
+            val header = TextView(requireContext()).apply {
+                text = getString(R.string.category_extra)
+                textSize = 16f
+                setTypeface(null, Typeface.BOLD)
+                setTextColor(0xFF291317.toInt())
+                setPadding(0, 24, 0, 8)
+            }
+            ingredientsPanel.addView(header)
+            buildCheckboxGroup(extras)
+        }
+
+        // Sauce section as radio buttons (tómatsósa, mæjó, sinnep)
+        val sauces = allIngredients.filter { it.id in IngredientRestrictions.kidsBurgerSauceIds }
+        if (sauces.isNotEmpty()) {
+            val header = TextView(requireContext()).apply {
+                text = getString(R.string.category_sosur)
+                textSize = 16f
+                setTypeface(null, Typeface.BOLD)
+                setTextColor(0xFF291317.toInt())
+                setPadding(0, 24, 0, 8)
+            }
+            ingredientsPanel.addView(header)
+            buildSauceRadioGroup(sauces)
+        }
+        // No toppings (alegg) section for kids burger
     }
 
     /** Cheese: radio-style — pick one or none. Tapping the selected one deselects it. */
@@ -199,9 +282,6 @@ class ItemDetailsFragment : Fragment() {
         val radioGroup = RadioGroup(requireContext()).apply {
             orientation = RadioGroup.VERTICAL
         }
-
-        // Determine which cheese is default-checked
-        val defaultCheese = cheeseIngredients.find { it.id in checkedIngredientIds }
 
         for (ig in cheeseIngredients) {
             val rb = RadioButton(requireContext()).apply {
@@ -214,16 +294,46 @@ class ItemDetailsFragment : Fragment() {
             }
             radioGroup.addView(rb)
 
-            // Allow deselecting by tapping the already-selected radio button
             rb.setOnClickListener {
                 if (ig.id in checkedIngredientIds) {
-                    // Already was checked — deselect
                     rb.isChecked = false
                     radioGroup.clearCheck()
                     checkedIngredientIds.remove(ig.id)
                 } else {
-                    // Remove all other cheese from checked set, add this one
                     cheeseIngredients.forEach { checkedIngredientIds.remove(it.id) }
+                    checkedIngredientIds.add(ig.id)
+                }
+                updatePriceDisplay()
+            }
+        }
+
+        ingredientsPanel.addView(radioGroup)
+    }
+
+    /** Sauce as radio buttons (pick one) - used for vegan wings and kids burger */
+    private fun buildSauceRadioGroup(sauceIngredients: List<Ingredient>) {
+        val radioGroup = RadioGroup(requireContext()).apply {
+            orientation = RadioGroup.VERTICAL
+        }
+
+        for (ig in sauceIngredients) {
+            val rb = RadioButton(requireContext()).apply {
+                text = ig.name
+                id = View.generateViewId()
+                textSize = 15f
+                setTextColor(0xFF291317.toInt())
+                setPadding(8, 4, 0, 4)
+                isChecked = ig.id in checkedIngredientIds
+            }
+            radioGroup.addView(rb)
+
+            rb.setOnClickListener {
+                if (ig.id in checkedIngredientIds) {
+                    rb.isChecked = false
+                    radioGroup.clearCheck()
+                    checkedIngredientIds.remove(ig.id)
+                } else {
+                    sauceIngredients.forEach { checkedIngredientIds.remove(it.id) }
                     checkedIngredientIds.add(ig.id)
                 }
                 updatePriceDisplay()
@@ -263,6 +373,7 @@ class ItemDetailsFragment : Fragment() {
                     } else {
                         checkedIngredientIds.remove(ig.id)
                     }
+                    updateAukaOsturLabel()
                     updatePriceDisplay()
                 }
             }
@@ -271,11 +382,36 @@ class ItemDetailsFragment : Fragment() {
         }
     }
 
+    /** Update the auka ostur checkbox label when auka kjöt is toggled */
+    private fun updateAukaOsturLabel() {
+        val aukaKjotChecked = 1 in checkedIngredientIds
+        // Update Auka ostur label
+        checkBoxMap[2]?.let { cb ->
+            val ig = allIngredients.find { it.id == 2 }
+            if (ig != null) {
+                val price = if (aukaKjotChecked) ig.extraPriceIsk * 2 else ig.extraPriceIsk
+                cb.text = if (price > 0) "${ig.name} +${price} kr" else ig.name
+            }
+        }
+        // Update Auka vegan ostur label
+        checkBoxMap[17]?.let { cb ->
+            val ig = allIngredients.find { it.id == 17 }
+            if (ig != null) {
+                val price = if (aukaKjotChecked) ig.extraPriceIsk * 2 else ig.extraPriceIsk
+                cb.text = if (price > 0) "${ig.name} +${price} kr" else ig.name
+            }
+        }
+    }
+
     private fun updatePriceDisplay() {
         val item = BasketService.getItemById(itemId) ?: return
+        val aukaKjotChecked = 1 in checkedIngredientIds
         val extrasPrice = allIngredients
             .filter { it.id in checkedIngredientIds && it.extraPriceIsk > 0 && it.id !in defaultIngredientIds }
-            .sumOf { it.extraPriceIsk }
+            .sumOf { ig ->
+                if ((ig.id == 2 || ig.id == 17) && aukaKjotChecked) ig.extraPriceIsk * 2
+                else ig.extraPriceIsk
+            }
         val totalPrice = item.priceIsk + extrasPrice
         tvItemPrice.text = "$totalPrice ISK"
     }

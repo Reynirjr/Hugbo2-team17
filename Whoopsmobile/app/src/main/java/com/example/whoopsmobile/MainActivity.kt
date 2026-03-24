@@ -11,6 +11,7 @@ import com.example.whoopsmobile.service.BasketService
 import com.example.whoopsmobile.service.SessionManager
 import com.example.whoopsmobile.ui.basket.BasketFragment
 import com.example.whoopsmobile.ui.checkout.CheckoutFragment
+import com.example.whoopsmobile.ui.combo.ComboBuilderFragment
 import com.example.whoopsmobile.ui.itemdetails.ItemDetailsFragment
 import com.example.whoopsmobile.ui.menu.MenuFragment
 import com.example.whoopsmobile.ui.orderstatus.OrderStatusFragment
@@ -90,6 +91,13 @@ class MainActivity : AppCompatActivity() {
     fun openItemDetails(itemId: Int) {
         supportFragmentManager.beginTransaction()
             .replace(R.id.main, ItemDetailsFragment.newInstance(itemId))
+            .addToBackStack(null)
+            .commit()
+    }
+
+    fun openComboBuilder(comboItemId: Int) {
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.main, ComboBuilderFragment.newInstance(comboItemId))
             .addToBackStack(null)
             .commit()
     }
